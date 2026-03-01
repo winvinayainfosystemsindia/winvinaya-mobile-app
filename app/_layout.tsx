@@ -84,8 +84,9 @@ function RootLayoutNav() {
     <QueryClientProvider client={queryClient}>
       <PaperProvider theme={colorScheme === 'dark' ? CombinedDarkTheme : CombinedLightTheme}>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(app)" />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
         </ThemeProvider>
