@@ -4,8 +4,10 @@ from pydantic import PostgresDsn, field_validator
 from typing import Any, Dict, Optional
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Winvinaya API"
+    PROJECT_NAME: str = "Winvinaya LMS"
     API_V1_STR: str = "/api/v1"
+    SECRET_KEY: str = "dev_secret"
+    ENVIRONMENT: str = "development"
     
     POSTGRES_SERVER: str
     POSTGRES_USER: str
@@ -16,23 +18,37 @@ class Settings(BaseSettings):
     DATABASE_URL: Optional[str] = None
     SYNC_DATABASE_URL: Optional[str] = None
 
+    # Media Configuration
+    UPLOAD_DIR: str = "/app/uploads"
+    MAX_CONTENT_LENGTH: int = 1073741824  # 1GB
+
     @field_validator("DATABASE_URL", mode="before")
     @classmethod
     def assemble_db_connection(cls, v: Optional[str], info: Any) -> Any:
-        if isinstance(v, str):
+        if isinstance(v, str) and v:
             return v
         return f"postgresql+asyncpg://{info.data['POSTGRES_USER']}:{info.data['POSTGRES_PASSWORD']}@{info.data['POSTGRES_SERVER']}:{info.data['POSTGRES_PORT']}/{info.data['POSTGRES_DB']}"
 
     @field_validator("SYNC_DATABASE_URL", mode="before")
     @classmethod
     def assemble_sync_db_connection(cls, v: Optional[str], info: Any) -> Any:
-        if isinstance(v, str):
+        if isinstance(v, str) and v:
             return v
         return f"postgresql://{info.data['POSTGRES_USER']}:{info.data['POSTGRES_PASSWORD']}@{info.data['POSTGRES_SERVER']}:{info.data['POSTGRES_PORT']}/{info.data['POSTGRES_DB']}"
 
+    @classmethod
+    def get_env_file(cls) -> str:
+        env = os.getenv("ENVIRONMENT", "development").lower()
+        if env == "production":
+            return ".env.prod"
+        elif env == "qa":
+            return ".env.qa"
+        return ".env.dev"
+
     model_config = SettingsConfigDict(
-        env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),
+        env_file=get_env_file(),
         case_sensitive=True,
+        extra="ignore"
     )
 
 settings = Settings()
