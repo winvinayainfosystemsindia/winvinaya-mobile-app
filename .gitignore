@@ -1,78 +1,38 @@
-<<<<<<< HEAD
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
-# dependencies
+# Dependency directories
 node_modules/
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
 
-# Expo
+# Expo/React Native
 .expo/
 dist/
 web-build/
-expo-env.d.ts
-
-# Native
-.kotlin/
-*.orig.*
 *.jks
 *.p8
-*.p12
-*.key
-*.mobileprovision
+*.pyc
 
-# Metro
-.metro-health-check*
+# Environment variables
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
 
-# debug
-npm-debug.*
-yarn-debug.*
-yarn-error.*
-
-# macOS
-.DS_Store
-*.pem
-
-# local env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-
-# generated native folders
-/ios
-/android
-=======
-# Gradle files
-.gradle/
-build/
-
-# Local configuration file (sdk path, etc)
-local.properties
-
-# Log/OS Files
-*.log
-
-# Android Studio generated files and folders
-captures/
-.externalNativeBuild/
-.cxx/
-*.aab
-*.apk
-output-metadata.json
-
-# IntelliJ
-*.iml
+# IDEs
+.vscode/
 .idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
+*.swp
+*.swo
 
-# Keystore files
-*.jks
-*.keystore
+# OS files
+.DS_Store
+Thumbs.db
 
-# Google Services (e.g. APIs or Firebase)
-google-services.json
-
-# Android Profiling
-*.hprof
->>>>>>> 1de43fa9bd113aec1a7e46d5cd9cb043011176b9
+# Backend specific
+alembic/versions/*.pyc
+**/__pycache__/
+**/*.pyc
