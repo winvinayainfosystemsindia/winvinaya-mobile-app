@@ -1,15 +1,49 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
+import { useColorScheme } from 'react-native';
+import {
+  MD3DarkTheme,
+  MD3LightTheme,
+  Provider as PaperProvider,
+  adaptNavigationTheme
+} from 'react-native-paper';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/components/useColorScheme';
+import { queryClient } from '@/services/queryClient';
+
+const { LightTheme: AdaptedLightTheme, DarkTheme: AdaptedDarkTheme } = adaptNavigationTheme({
+  reactNavigationLight: DefaultTheme,
+  reactNavigationDark: DarkTheme,
+});
+
+const CombinedLightTheme = {
+  ...MD3LightTheme,
+  ...AdaptedLightTheme,
+  colors: {
+    ...MD3LightTheme.colors,
+    ...AdaptedLightTheme.colors,
+  },
+  // Ensure we keep the MD3 fonts which containvariants like labelLarge, headlineMedium, etc.
+  fonts: MD3LightTheme.fonts,
+};
+
+const CombinedDarkTheme = {
+  ...MD3DarkTheme,
+  ...AdaptedDarkTheme,
+  colors: {
+    ...MD3DarkTheme.colors,
+    ...AdaptedDarkTheme.colors,
+  },
+  fonts: MD3DarkTheme.fonts,
+};
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary,
+  ErrorBoundary
 } from 'expo-router';
 
 export const unstable_settings = {
@@ -47,11 +81,15 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <PaperProvider theme={colorScheme === 'dark' ? CombinedDarkTheme : CombinedLightTheme}>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          </Stack>
+        </ThemeProvider>
+      </PaperProvider>
+    </QueryClientProvider>
   );
 }
