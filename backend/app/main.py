@@ -4,13 +4,18 @@ from app.core.config import settings
 from app.middleware.logging import LoggingMiddleware
 
 app = FastAPI(
-    title=settings.PROJECT_NAME,
-    openapi_url=f"{settings.API_V1_STR}/openapi.json"
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION,
+    openapi_url=f"{settings.API_V1_PREFIX}/openapi.json"
 )
 
 app.add_middleware(LoggingMiddleware)
-app.include_router(api_router, prefix=settings.API_V1_STR)
+app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "environment": settings.ENVIRONMENT}
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to Winvinaya API"}
+    return {"message": f"Welcome to {settings.APP_NAME}"}

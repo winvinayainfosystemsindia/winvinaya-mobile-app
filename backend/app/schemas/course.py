@@ -35,6 +35,10 @@ class CourseBase(BaseModel):
     title: str
     description: Optional[str] = None
 
+class CourseUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+
 class CourseCreate(CourseBase):
     pass
 
