@@ -36,3 +36,5 @@ Thumbs.db
 alembic/versions/*.pyc
 **/__pycache__/
 **/*.pyc
+.gitignore
+/docs/
