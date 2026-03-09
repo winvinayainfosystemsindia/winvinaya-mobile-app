@@ -1,6 +1,9 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
+from uuid import UUID
+
+from app.models.user import UserRole
 
 # Shared properties
 class UserBase(BaseModel):

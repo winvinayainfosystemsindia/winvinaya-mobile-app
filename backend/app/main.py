@@ -11,7 +11,10 @@ from app.core.exceptions import LMSException
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup logic (e.g. check DB connection, initialize redis)
+    # Startup logic
+    import os
+    if not os.path.exists(settings.STORAGE_ROOT):
+        os.makedirs(settings.STORAGE_ROOT, exist_ok=True)
     yield
     # Shutdown logic
 
@@ -43,6 +46,9 @@ async def lms_exception_handler(request: Request, exc: LMSException):
 
 # Static files for local development (NGINX handles this in prod)
 if settings.DEBUG:
+    import os
+    if not os.path.exists(settings.STORAGE_ROOT):
+        os.makedirs(settings.STORAGE_ROOT, exist_ok=True)
     app.mount("/storage", StaticFiles(directory=settings.STORAGE_ROOT), name="storage")
 
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)

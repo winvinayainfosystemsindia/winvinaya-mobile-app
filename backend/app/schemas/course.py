@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
+from uuid import UUID
+
+from app.models.course import CourseLevel, CourseStatus
 
 class LessonBase(BaseModel):
     title: str
