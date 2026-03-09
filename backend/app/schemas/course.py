@@ -34,17 +34,38 @@ class ModuleResponse(ModuleBase):
 class CourseBase(BaseModel):
     title: str
     description: Optional[str] = None
+    short_description: Optional[str] = None
+    category: Optional[str] = None
+    level: Optional[CourseLevel] = CourseLevel.beginner
+    language: str = "en"
+    tags: Optional[str] = None
+    is_free: bool = False
+    price: int = 0
 
 class CourseUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
+    short_description: Optional[str] = None
+    status: Optional[CourseStatus] = None
+    category: Optional[str] = None
+    level: Optional[CourseLevel] = None
+    tags: Optional[str] = None
+    is_featured: Optional[bool] = None
+    is_free: Optional[bool] = None
+    price: Optional[int] = None
 
 class CourseCreate(CourseBase):
-    pass
+    instructor_id: int
 
 class CourseResponse(CourseBase):
     id: int
-    instructor_id: Optional[int]
+    public_id: UUID
+    slug: Optional[str] = None
+    status: CourseStatus
+    thumbnail_url: Optional[str] = None
+    duration_minutes: int
+    instructor_id: int
+    is_featured: bool
     created_at: datetime
     modules: List[ModuleResponse] = []
     class Config:

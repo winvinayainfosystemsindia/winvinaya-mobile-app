@@ -1,11 +1,50 @@
+# Web Framework
 fastapi[all]
-uvicorn
+uvicorn[standard]
+
+# Database
 sqlalchemy[asyncio]
 alembic
 asyncpg
-pydantic-settings
-python-dotenv
 psycopg2-binary
+
+# Settings & Validation
+pydantic-settings
+pydantic[email]
+python-dotenv
+
+# Auth & Security
 passlib[bcrypt]
+python-jose[cryptography]
 python-multipart
-jose[cryptography]
+
+# Async File I/O
+aiofiles
+
+# Image Processing
+Pillow
+
+# PDF Generation
+reportlab
+
+# Video Metadata
+ffmpeg-python
+
+# Task Queue — Celery + Redis
+celery[redis]
+redis
+
+# HTTP Client (tests & internal calls)
+httpx
+
+# Testing
+pytest
+pytest-asyncio
+pytest-cov
+
+# Email
+emails
+
+# Utilities
+python-slugify
+shortuuid

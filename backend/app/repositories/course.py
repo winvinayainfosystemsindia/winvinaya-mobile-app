@@ -1,15 +1,38 @@
-from typing import List, Any, Optional
+from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+
 from app.models.course import Course, Module, Lesson
+from app.models.enrollment import Enrollment
 from app.repositories.base import BaseRepository
 from app.schemas.course import CourseCreate, CourseUpdate
 
-# We can keep standard CRUD in BaseRepository and add specific ones here if needed
-class CourseRepository(BaseRepository[Course, CourseCreate, CourseUpdate]): 
+
+class CourseRepository(BaseRepository[Course, CourseCreate, CourseUpdate]):
+
     async def get_with_modules(self, db: AsyncSession, course_id: int) -> Optional[Course]:
-        # Implementation with joinedload would go here for optimization
-        result = await db.execute(select(Course).filter(Course.id == course_id))
+        result = await db.execute(
+            select(Course)
+            .options(selectinload(Course.modules).selectinload(Module.lessons))
+            .filter(Course.id == course_id)
+        )
         return result.scalars().first()
+
+    async def get_by_slug(self, db: AsyncSession, slug: str) -> Optional[Course]:
+        result = await db.execute(select(Course).filter(Course.slug == slug))
+        return result.scalars().first()
+
+    async def get_published(self, db: AsyncSession, *, skip: int = 0, limit: int = 20) -> List[Course]:
+        from app.models.course import CourseStatus
+        result = await db.execute(
+            select(Course).filter(Course.status == CourseStatus.published).offset(skip).limit(limit)
+        )
+        return result.scalars().all()
+
+    async def get_by_instructor(self, db: AsyncSession, instructor_id: int) -> List[Course]:
+        result = await db.execute(select(Course).filter(Course.instructor_id == instructor_id))
+        return result.scalars().all()
+
 
 course_repository = CourseRepository(Course)
