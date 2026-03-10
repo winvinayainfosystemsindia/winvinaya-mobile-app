@@ -1,7 +1,7 @@
 """
 Auth endpoint — JWT login, token refresh, and logout.
 """
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
@@ -27,14 +27,47 @@ class RefreshRequest(BaseModel):
     refresh_token: str
 
 
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
 @router.post("/login", response_model=TokenResponse, summary="Login with email & password")
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    request: Request,
     db: AsyncSession = Depends(get_db),
 ):
-    """Returns access + refresh tokens on successful authentication."""
-    user = await user_repository.get_by_email(db, email=form_data.username)
-    if not user or not verify_password(form_data.password, user.hashed_password):
+    """Returns access + refresh tokens on successful authentication.
+    Supports both JSON body and application/x-www-form-urlencoded.
+    """
+    content_type = request.headers.get("content-type", "")
+    email = None
+    password = None
+
+    if "application/json" in content_type:
+        try:
+            data = await request.json()
+            email = data.get("email") or data.get("username")
+            password = data.get("password")
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid JSON body")
+    else:
+        # Fallback to form data (useful for Swagger UI and older clients)
+        try:
+            form = await request.form()
+            email = form.get("username") or form.get("email")
+            password = form.get("password")
+        except Exception:
+            raise HTTPException(status_code=400, detail="Invalid form data")
+
+    if not email or not password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email and password are required."
+        )
+
+    user = await user_repository.get_by_email(db, email=email)
+    if not user or not verify_password(password, user.hashed_password):
         raise UnauthorizedError("Incorrect email or password.")
     if not user.is_active:
         raise UnauthorizedError("Account is deactivated.")
