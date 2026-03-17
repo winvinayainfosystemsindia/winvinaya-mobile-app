@@ -16,8 +16,10 @@ interface CourseCardProps {
     rating: number;
     reviewsCount: number;
     price?: number;
+    originalPrice?: number;
     progress?: number; // 0 to 100
     category?: string;
+    bestSeller?: boolean;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({
@@ -27,8 +29,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
     rating,
     reviewsCount,
     price,
+    originalPrice,
     progress,
-    category
+    category,
+    bestSeller
 }) => {
     const isEnrolled = progress !== undefined;
 
@@ -116,9 +120,33 @@ const CourseCard: React.FC<CourseCardProps> = ({
                         </Box>
                     </Box>
                 ) : (
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, mt: 'auto' }}>
-                        ₹{price?.toLocaleString()}
-                    </Typography>
+                    <Box sx={{ mt: 'auto' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                                ₹{price?.toLocaleString()}
+                            </Typography>
+                            {originalPrice && (
+                                <Typography variant="body2" sx={{ color: 'text.secondary', textDecoration: 'line-through' }}>
+                                    ₹{originalPrice.toLocaleString()}
+                                </Typography>
+                            )}
+                        </Box>
+                        {bestSeller && (
+                            <Box 
+                                sx={{ 
+                                    mt: 0.5, 
+                                    display: 'inline-block', 
+                                    bgcolor: '#eceb98', 
+                                    px: 1, 
+                                    py: 0.2, 
+                                    fontSize: '0.75rem', 
+                                    fontWeight: 700 
+                                }}
+                            >
+                                Bestseller
+                            </Box>
+                        )}
+                    </Box>
                 )}
             </CardContent>
         </Card>

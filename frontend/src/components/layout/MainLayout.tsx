@@ -19,7 +19,9 @@ import {
 	useMediaQuery,
 	useTheme,
 	InputBase,
-	Paper
+	Paper,
+	Stack,
+	Button
 } from '@mui/material';
 import {
 	Menu as MenuIcon,
@@ -43,7 +45,7 @@ const MainLayout: React.FC = () => {
 	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-	const { user } = useAppSelector((state) => state.auth);
+	const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 	const navigate = useNavigate();
 	const location = useLocation();
 	const dispatch = useAppDispatch();
@@ -191,7 +193,7 @@ const MainLayout: React.FC = () => {
 					{!isMobile && (
 						<Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
 							<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
-								Udemy Business
+								WinVinaya Business
 							</Typography>
 							<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
 								Teach on WinVinaya
@@ -202,42 +204,80 @@ const MainLayout: React.FC = () => {
 					<Box sx={{ flexGrow: 1 }} />
 
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-						{!isMobile && (
+						{isAuthenticated ? (
 							<>
-								<Tooltip title="Favorites">
-									<IconButton color="inherit">
-										<FavoriteBorderIcon />
-									</IconButton>
-								</Tooltip>
-								<Tooltip title="Shopping Cart">
-									<IconButton color="inherit">
-										<ShoppingBagIcon />
-									</IconButton>
-								</Tooltip>
-								<Tooltip title="Notifications">
-									<IconButton color="inherit">
-										<NotificationsIcon />
-									</IconButton>
-								</Tooltip>
+								{!isMobile && (
+									<>
+										<Tooltip title="Favorites">
+											<IconButton color="inherit">
+												<FavoriteBorderIcon />
+											</IconButton>
+										</Tooltip>
+										<Tooltip title="Shopping Cart">
+											<IconButton color="inherit">
+												<ShoppingBagIcon />
+											</IconButton>
+										</Tooltip>
+										<Tooltip title="Notifications">
+											<IconButton color="inherit">
+												<NotificationsIcon />
+											</IconButton>
+										</Tooltip>
+									</>
+								)}
+
+								<IconButton
+									onClick={handleMenuOpen}
+									sx={{ p: 0.5 }}
+								>
+									<Avatar 
+										sx={{ 
+											width: 32, 
+											height: 32, 
+											bgcolor: '#1c1d1f', 
+											fontSize: '0.875rem',
+											borderRadius: '50%'
+										}}
+									>
+										{user?.email?.charAt(0).toUpperCase() || 'U'}
+									</Avatar>
+								</IconButton>
 							</>
+						) : (
+							<Stack direction="row" spacing={1}>
+								<Button 
+									variant="outlined" 
+									sx={{ 
+										borderColor: '#1c1d1f', 
+										color: '#1c1d1f', 
+										fontWeight: 700, 
+                                        borderRadius: 0,
+                                        height: 40,
+                                        px: 3,
+										'&:hover': { bgcolor: 'rgba(28,29,31,0.04)', borderColor: '#1c1d1f' }
+									}}
+									onClick={() => navigate('/login')}
+								>
+									Log in
+								</Button>
+								<Button 
+									variant="contained" 
+									sx={{ 
+										bgcolor: '#1c1d1f', 
+										color: '#ffffff', 
+										fontWeight: 700, 
+                                        borderRadius: 0,
+                                        height: 40,
+                                        px: 3,
+										'&:hover': { bgcolor: '#000000' }
+									}}
+									onClick={() => navigate('/register')}
+								>
+									Sign up
+								</Button>
+							</Stack>
 						)}
 
-						<IconButton
-							onClick={handleMenuOpen}
-							sx={{ p: 0.5 }}
-						>
-							<Avatar 
-								sx={{ 
-									width: 32, 
-									height: 32, 
-									bgcolor: '#1c1d1f', 
-									fontSize: '0.875rem',
-									borderRadius: '50%'
-								}}
-							>
-								{user?.email?.charAt(0).toUpperCase() || 'U'}
-							</Avatar>
-						</IconButton>
 						<Menu
 							anchorEl={anchorEl}
 							open={Boolean(anchorEl)}

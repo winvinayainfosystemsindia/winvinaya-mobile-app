@@ -66,12 +66,28 @@ export const loginUser = createAsyncThunk(
 	'auth/login',
 	async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
 		try {
+// Login
 			const response = await authService.login(email, password);
 			// Fetch user details immediately after login
 			const user = await authService.getCurrentUser();
 			return { ...response, user };
 		} catch (error: any) {
 			return rejectWithValue(error.response?.data?.detail || 'Login failed');
+		}
+	}
+);
+
+/**
+ * Register user
+ */
+export const registerUser = createAsyncThunk(
+	'auth/register',
+	async (userData: any, { rejectWithValue }) => {
+		try {
+			const response = await authService.register(userData);
+			return response;
+		} catch (error: any) {
+			return rejectWithValue(error.response?.data?.detail || 'Registration failed');
 		}
 	}
 );
