@@ -45,6 +45,15 @@ pytest-cov
 # Email
 emails
 
+# Rate Limiting
+slowapi
+
+# OAuth 2.0 / SSO
+authlib
+
+# Signed Tokens (video share URLs)
+itsdangerous
+
 # Utilities
 python-slugify
 shortuuid

@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     REDIS_URL: str = "redis://redis:6379/0"
     CELERY_BROKER_URL: str = "redis://redis:6379/0"
     CELERY_RESULT_BACKEND: str = "redis://redis:6379/1"
+    # Cache uses DB 2 so it's isolated from Celery broker (DB 0) and results (DB 1)
+    REDIS_CACHE_DB: int = 2
+    CACHE_DEFAULT_TTL: int = 300  # 5 minutes
 
     # ─── Local Storage ──────────────────────────────────────────────────────
     STORAGE_ROOT: str = "/app/storage"
@@ -83,6 +86,27 @@ class Settings(BaseSettings):
     THUMBNAIL_WIDTH: int = 1280
     THUMBNAIL_HEIGHT: int = 720
     AVATAR_SIZE: int = 256
+
+    # ─── OAuth 2.0 Providers (all optional) ────────────────────────────────
+    # Google
+    GOOGLE_CLIENT_ID: Optional[str] = None
+    GOOGLE_CLIENT_SECRET: Optional[str] = None
+
+    # Microsoft Azure AD
+    AZURE_CLIENT_ID: Optional[str] = None
+    AZURE_CLIENT_SECRET: Optional[str] = None
+    AZURE_TENANT_ID: Optional[str] = "common"
+
+    # GitHub
+    GITHUB_CLIENT_ID: Optional[str] = None
+    GITHUB_CLIENT_SECRET: Optional[str] = None
+
+    # Redirect base for OAuth callbacks
+    OAUTH_REDIRECT_BASE: str = "http://localhost:8000"
+
+    # ─── Signed Share Tokens (video sharing) ────────────────────────────────
+    SHARE_TOKEN_SECRET: str = "changeme-share-token-secret"
+    SHARE_TOKEN_TTL_SECONDS: int = 86400  # 24 hours
 
     # ─── Email / SMTP ────────────────────────────────────────────────────────
     SMTP_HOST: str = "smtp.gmail.com"

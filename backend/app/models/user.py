@@ -22,11 +22,15 @@ class User(Base):
 
     full_name = Column(String(255), index=True)
     email = Column(String(255), unique=True, index=True, nullable=False)
-    hashed_password = Column(String(255), nullable=False)
+    hashed_password = Column(String(255), nullable=True)  # nullable for OAuth-only users
     role = Column(Enum(UserRole), default=UserRole.learner, nullable=False)
 
     bio = Column(Text, nullable=True)
     avatar_url = Column(String(500), nullable=True)
+
+    # OAuth / SSO fields
+    oauth_provider = Column(String(50), nullable=True, index=True)     # e.g. "google", "microsoft"
+    oauth_provider_id = Column(String(255), nullable=True, index=True) # provider's user ID
 
     is_active = Column(Boolean(), default=True, nullable=False)
     is_verified = Column(Boolean(), default=False, nullable=False)

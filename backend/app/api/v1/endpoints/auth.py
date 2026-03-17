@@ -1,8 +1,13 @@
 """
-Auth endpoint — JWT login, token refresh, and logout.
+Auth endpoint — JWT login, token refresh.
+
+Rate limits:
+  - /login:   10 req/min (brute-force protection)
+  - /refresh: 20 req/min
+
+Fixes hashed_password null check for OAuth-only users.
 """
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel
 from typing import Optional
@@ -12,6 +17,7 @@ from app.core.security import (
     verify_password, create_access_token, create_refresh_token, verify_refresh_token
 )
 from app.core.exceptions import UnauthorizedError
+from app.middleware.rate_limit import limiter, LIMIT_AUTH
 from app.repositories.user import user_repository
 
 router = APIRouter()
@@ -33,12 +39,15 @@ class LoginRequest(BaseModel):
 
 
 @router.post("/login", response_model=TokenResponse, summary="Login with email & password")
+@limiter.limit(LIMIT_AUTH)
 async def login(
     request: Request,
     db: AsyncSession = Depends(get_db),
 ):
-    """Returns access + refresh tokens on successful authentication.
+    """
+    Returns access + refresh tokens on successful authentication.
     Supports both JSON body and application/x-www-form-urlencoded.
+    Rate-limited to 10 requests/minute per IP to prevent brute-force attacks.
     """
     content_type = request.headers.get("content-type", "")
     email = None
@@ -52,7 +61,6 @@ async def login(
         except Exception:
             raise HTTPException(status_code=400, detail="Invalid JSON body")
     else:
-        # Fallback to form data (useful for Swagger UI and older clients)
         try:
             form = await request.form()
             email = form.get("username") or form.get("email")
@@ -67,8 +75,14 @@ async def login(
         )
 
     user = await user_repository.get_by_email(db, email=email)
-    if not user or not verify_password(password, user.hashed_password):
+
+    # Guard: OAuth-only users have no local password
+    if not user or not user.hashed_password:
         raise UnauthorizedError("Incorrect email or password.")
+
+    if not verify_password(password, user.hashed_password):
+        raise UnauthorizedError("Incorrect email or password.")
+
     if not user.is_active:
         raise UnauthorizedError("Account is deactivated.")
 
@@ -80,7 +94,9 @@ async def login(
 
 
 @router.post("/refresh", response_model=TokenResponse, summary="Refresh access token")
+@limiter.limit("20/minute")
 async def refresh_token(
+    request: Request,
     payload: RefreshRequest,
     db: AsyncSession = Depends(get_db),
 ):
