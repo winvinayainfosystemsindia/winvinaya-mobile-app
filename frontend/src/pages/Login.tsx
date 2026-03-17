@@ -4,13 +4,20 @@ import {
 	Container,
 	Box,
 	Typography,
-	Paper,
 	TextField,
 	CircularProgress,
 	IconButton,
-	InputAdornment
+	InputAdornment,
+	Divider,
+	Stack
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { 
+    Visibility, 
+    VisibilityOff, 
+    Google as GoogleIcon, 
+    GitHub as GitHubIcon,
+    Facebook as FacebookIcon
+} from '@mui/icons-material';
 
 import { useNavigate } from 'react-router-dom';
 import useToast from '../hooks/useToast';
@@ -28,7 +35,6 @@ const Login: React.FC = () => {
 	const [showPassword, setShowPassword] = useState(false);
 
 	useEffect(() => {
-		// Only redirect if auth is initialized and user is authenticated
 		if (isInitialized && isAuthenticated) {
 			navigate('/dashboard');
 		}
@@ -37,7 +43,6 @@ const Login: React.FC = () => {
 	useEffect(() => {
 		if (error) {
 			toast.error(typeof error === 'string' ? error : 'Login failed');
-			// Adding a timeout to clear error to avoid immediate toast re-triggers if needed
 			const timer = setTimeout(() => dispatch(clearError()), 3000);
 			return () => clearTimeout(timer);
 		}
@@ -46,7 +51,6 @@ const Login: React.FC = () => {
 	const handleTogglePasswordVisibility = () => {
 		setShowPassword((prev: boolean) => !prev);
 	};
-
 
 	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -58,131 +62,166 @@ const Login: React.FC = () => {
 		}
 	};
 
-
 	return (
 		<Box
 			component="main"
 			sx={{
 				minHeight: '100vh',
 				display: 'flex',
-				alignItems: 'center',
-				justifyContent: 'center',
-				backgroundColor: '#f2f3f3'
+				flexDirection: 'column',
+				bgcolor: '#ffffff'
 			}}
 		>
-			<Container maxWidth="xs">
-				<Box sx={{ mb: 4, textAlign: 'center' }}>
-					{/* Find a logo or use text */}
-					<Typography variant="h4" component="h1" fontWeight="bold" sx={{ color: '#232f3e' }}>
-						WinVinaya
+            {/* Minimal Header */}
+            <Box sx={{ p: 3, borderBottom: '1px solid #d1d7dc' }}>
+                <Typography 
+                    variant="h5" 
+                    sx={{ 
+                        fontWeight: 800, 
+                        color: '#1c1d1f', 
+                        cursor: 'pointer',
+                        letterSpacing: -1
+                    }}
+                    onClick={() => navigate('/')}
+                >
+                    WinVinaya
+                </Typography>
+            </Box>
+
+			<Container maxWidth="xs" sx={{ mt: 8, mb: 8 }}>
+				<Box sx={{ textAlign: 'left', mb: 3 }}>
+					<Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
+						Log in to your WinVinaya account
 					</Typography>
 				</Box>
-				<Paper
-					elevation={0}
-					sx={{ p: 4, display: 'flex', flexDirection: 'column', border: '1px solid #ddd', borderRadius: '4px' }}
-				>
-					<Typography component="h2" variant="h5" sx={{ mb: 3, fontWeight: 500 }}>
-						Sign in
-					</Typography>
 
-					{/* Accessible error announcement */}
-					{error && (
-						<Box
-							role="alert"
-							aria-live="assertive"
-							sx={{
-								mb: 2,
-								p: 1.5,
-								bgcolor: '#fdeded',
-								color: '#5f2120',
-								borderRadius: '4px',
-								border: '1px solid #5f2120',
-								fontSize: '0.875rem'
-							}}
-						>
-							<Typography variant="body2">{error}</Typography>
-						</Box>
-					)}
+				<Stack spacing={1.5} sx={{ mb: 3 }}>
+                    <Button 
+                        variant="outlined" 
+                        fullWidth 
+                        startIcon={<GoogleIcon />}
+                        sx={{ 
+                            justifyContent: 'flex-start', 
+                            pl: 3, 
+                            borderColor: '#1c1d1f', 
+                            color: '#1c1d1f',
+                            fontWeight: 700,
+                            height: 48,
+                            '&:hover': { borderColor: '#1c1d1f', bgcolor: 'rgba(28,29,31,0.04)' }
+                        }}
+                    >
+                        Continue with Google
+                    </Button>
+                    <Button 
+                        variant="outlined" 
+                        fullWidth 
+                        startIcon={<FacebookIcon sx={{ color: '#1877F2' }} />}
+                        sx={{ 
+                            justifyContent: 'flex-start', 
+                            pl: 3, 
+                            borderColor: '#1c1d1f', 
+                            color: '#1c1d1f',
+                            fontWeight: 700,
+                            height: 48,
+                            '&:hover': { borderColor: '#1c1d1f', bgcolor: 'rgba(28,29,31,0.04)' }
+                        }}
+                    >
+                        Continue with Facebook
+                    </Button>
+                    <Button 
+                        variant="outlined" 
+                        fullWidth 
+                        startIcon={<GitHubIcon />}
+                        sx={{ 
+                            justifyContent: 'flex-start', 
+                            pl: 3, 
+                            borderColor: '#1c1d1f', 
+                            color: '#1c1d1f',
+                            fontWeight: 700,
+                            height: 48,
+                            '&:hover': { borderColor: '#1c1d1f', bgcolor: 'rgba(28,29,31,0.04)' }
+                        }}
+                    >
+                        Continue with GitHub
+                    </Button>
+                </Stack>
 
-					<Box component="form" onSubmit={handleLogin} noValidate>
-						<TextField
-							margin="normal"
-							required
-							fullWidth
-							id="email"
-							label="Email Address"
-							name="email"
-							autoComplete="email"
-							autoFocus
-							size="small"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							sx={{ mb: 2 }}
-							inputProps={{
-								'aria-required': 'true'
-							}}
-						/>
-						<TextField
-							margin="normal"
-							required
-							fullWidth
-							name="password"
-							label="Password"
-							type={showPassword ? 'text' : 'password'}
-							id="password"
-							autoComplete="current-password"
-							size="small"
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							sx={{ mb: 3 }}
-							inputProps={{
-								'aria-required': 'true'
-							}}
-							InputProps={{
-								endAdornment: (
-									<InputAdornment position="end">
-										<IconButton
-											aria-label={showPassword ? "hide password" : "show password"}
-											onClick={handleTogglePasswordVisibility}
-											edge="end"
-											size="small"
-											title={showPassword ? "Hide password" : "Show password"}
-										>
-											{showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
-										</IconButton>
-									</InputAdornment>
-								),
-							}}
-						/>
+                <Box component="form" onSubmit={handleLogin} noValidate>
+                    <TextField
+                        required
+                        fullWidth
+                        id="email"
+                        label="Email"
+                        name="email"
+                        autoComplete="email"
+                        autoFocus
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        sx={{ mb: 2 }}
+                    />
+                    <TextField
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        type={showPassword ? 'text' : 'password'}
+                        id="password"
+                        autoComplete="current-password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        sx={{ mb: 1 }}
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label={showPassword ? "hide password" : "show password"}
+                                        onClick={handleTogglePasswordVisibility}
+                                        edge="end"
+                                    >
+                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                    </IconButton>
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
 
-						<Button
-							type="submit"
-							fullWidth
-							variant="contained"
-							disabled={loading}
-							aria-busy={loading}
-							aria-label={loading ? "Signing in" : "Sign in"}
-							sx={{
-								py: 1,
-								backgroundColor: '#ec7211',
-								'&:hover': { backgroundColor: '#eb5f07' },
-								textTransform: 'none',
-								fontWeight: 'bold'
-							}}
-						>
-							{loading ? <CircularProgress size={24} color="inherit" aria-hidden="true" /> : 'Sign In'}
-						</Button>
-					</Box>
-				</Paper>
-				<Box sx={{ mt: 3, textAlign: 'center' }}>
-					<Typography variant="body2" color="text.secondary">
-						Protected by reCAPTCHA and subject to the Privacy Policy and Terms of Service.
-					</Typography>
-				</Box>
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        disabled={loading}
+                        sx={{
+                            mt: 2,
+                            mb: 2,
+                            height: 48,
+                            fontWeight: 700,
+                            fontSize: '1rem'
+                        }}
+                    >
+                        {loading ? <CircularProgress size={24} color="inherit" /> : 'Log in'}
+                    </Button>
+                </Box>
+
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
+                    <Typography variant="body2">
+                        or <Typography component="span" variant="body2" sx={{ fontWeight: 700, color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Forgot Password</Typography>
+                    </Typography>
+                    
+                    <Divider sx={{ my: 3 }} />
+                    
+                    <Typography variant="body2">
+                        Don't have an account? <Typography component="span" variant="body2" sx={{ fontWeight: 700, color: 'primary.main', cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Sign up</Typography>
+                    </Typography>
+                </Box>
 			</Container>
+
+            <Box sx={{ mt: 'auto', py: 4, borderTop: '1px solid #d1d7dc', textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                    © 2024 WinVinaya, Inc.
+                </Typography>
+            </Box>
 		</Box>
 	);
-
 };
 
 export default Login;

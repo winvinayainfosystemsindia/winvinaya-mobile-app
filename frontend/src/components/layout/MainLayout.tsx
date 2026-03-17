@@ -17,32 +17,31 @@ import {
 	Menu,
 	MenuItem,
 	useMediaQuery,
-	useTheme
+	useTheme,
+	InputBase,
+	Paper
 } from '@mui/material';
 import {
 	Menu as MenuIcon,
-	ChevronLeft as ChevronLeftIcon,
-	Dashboard as DashboardIcon,
 	Person as PersonIcon,
-	Logout as LogoutIcon,
 	Notifications as NotificationsIcon,
 	Search as SearchIcon,
 	Settings as SettingsIcon,
-	Groups as GroupsIcon,
-	Assignment as AssignmentIcon,
-	School as SchoolIcon
+	School as SchoolIcon,
+	ShoppingBag as ShoppingBagIcon,
+	FavoriteBorder as FavoriteBorderIcon,
+	Explore as ExploreIcon
 } from '@mui/icons-material';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { logoutUser } from '../../store/slices/authSlice';
-import Breadcrumbs from '../common/Breadcrumbs';
 
-const drawerWidth = 240;
+const drawerWidth = 260;
 
 const MainLayout: React.FC = () => {
 	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-	const [open, setOpen] = useState(!isMobile);
+	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+	const [mobileOpen, setMobileOpen] = useState(false);
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const { user } = useAppSelector((state) => state.auth);
 	const navigate = useNavigate();
@@ -50,7 +49,7 @@ const MainLayout: React.FC = () => {
 	const dispatch = useAppDispatch();
 
 	const handleDrawerToggle = () => {
-		setOpen(!open);
+		setMobileOpen(!mobileOpen);
 	};
 
 	const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -68,60 +67,54 @@ const MainLayout: React.FC = () => {
 	};
 
 	const menuItems = [
-		{ text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-		{ text: 'Candidates', icon: <GroupsIcon />, path: '/candidates' },
-		{ text: 'Training', icon: <SchoolIcon />, path: '/training' },
-		{ text: 'Allocations', icon: <AssignmentIcon />, path: '/allocations' },
-		{ text: 'Users', icon: <PersonIcon />, path: '/users', roles: ['admin'] },
+		{ text: 'My Learning', icon: <SchoolIcon />, path: '/dashboard' },
+		{ text: 'Browse Courses', icon: <ExploreIcon />, path: '/courses' },
+		{ text: 'Wishlist', icon: <FavoriteBorderIcon />, path: '/wishlist' },
+		{ text: 'My Cart', icon: <ShoppingBagIcon />, path: '/cart' },
+		{ text: 'Profile', icon: <PersonIcon />, path: '/profile' },
 		{ text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 	];
 
-	const filteredMenuItems = menuItems.filter(item => 
-		!item.roles || (user && item.roles.includes(user.role))
-	);
-
 	const drawer = (
-		<Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-			<Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: [1] }}>
-				<Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main', ml: 1 }}>
+		<Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', bgcolor: 'background.paper' }}>
+			<Box sx={{ p: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+				<Box 
+					component="img" 
+					src="/logo.png" 
+					alt="Udemy" 
+					sx={{ width: 32, height: 32, borderRadius: 0 }}
+					onError={(e: any) => e.target.style.display = 'none'} 
+				/>
+				<Typography variant="h6" sx={{ fontWeight: 700, letterSpacing: -0.5 }}>
 					WinVinaya
 				</Typography>
-				<IconButton onClick={handleDrawerToggle}>
-					<ChevronLeftIcon />
-				</IconButton>
-			</Toolbar>
+			</Box>
 			<Divider />
-			<List component="nav" sx={{ flexGrow: 1, py: 2 }}>
-				{filteredMenuItems.map((item) => (
-					<ListItem key={item.text} disablePadding sx={{ display: 'block' }}>
+			<List sx={{ px: 2, py: 2 }}>
+				{menuItems.map((item) => (
+					<ListItem key={item.text} disablePadding sx={{ mb: 0.5 }}>
 						<ListItemButton
-							onClick={() => navigate(item.path)}
+							onClick={() => {
+								navigate(item.path);
+								if (isMobile) setMobileOpen(false);
+							}}
 							selected={location.pathname === item.path}
 							sx={{
-								minHeight: 48,
-								justifyContent: open ? 'initial' : 'center',
-								px: 2.5,
-								mx: 1,
-								borderRadius: 1,
+								borderRadius: 0,
 								'&.Mui-selected': {
-									backgroundColor: 'rgba(236, 114, 17, 0.08)',
+									bgcolor: 'rgba(164, 53, 240, 0.08)',
 									color: 'primary.main',
-									'& .MuiListItemIcon-root': {
-										color: 'primary.main',
-									},
+									'& .MuiListItemIcon-root': { color: 'primary.main' },
+									'&:hover': { bgcolor: 'rgba(164, 53, 240, 0.12)' },
 								},
+								py: 1.5
 							}}
 						>
-							<ListItemIcon
-								sx={{
-									minWidth: 0,
-									mr: open ? 3 : 'auto',
-									justifyContent: 'center',
-								}}
-							>
-								{item.icon}
-							</ListItemIcon>
-							<ListItemText primary={item.text} sx={{ opacity: open ? 1 : 0 }} />
+							<ListItemIcon sx={{ minWidth: 40 }}>{item.icon}</ListItemIcon>
+							<ListItemText 
+								primary={item.text} 
+								primaryTypographyProps={{ fontWeight: location.pathname === item.path ? 700 : 400 }} 
+							/>
 						</ListItemButton>
 					</ListItem>
 				))}
@@ -130,112 +123,165 @@ const MainLayout: React.FC = () => {
 	);
 
 	return (
-		<Box sx={{ display: 'flex' }}>
+		<Box sx={{ display: 'flex', bgcolor: '#ffffff' }}>
 			<AppBar
 				position="fixed"
 				sx={{
 					zIndex: theme.zIndex.drawer + 1,
-					transition: theme.transitions.create(['width', 'margin'], {
-						easing: theme.transitions.easing.sharp,
-						duration: theme.transitions.duration.leavingScreen,
-					}),
-					...(open && {
-						marginLeft: drawerWidth,
-						width: `calc(100% - ${drawerWidth}px)`,
-						transition: theme.transitions.create(['width', 'margin'], {
-							easing: theme.transitions.easing.sharp,
-							duration: theme.transitions.duration.enteringScreen,
-						}),
-					}),
-					backgroundColor: '#ffffff',
-					color: 'text.primary',
-					borderBottom: '1px solid #d5dbdb'
+					bgcolor: '#ffffff',
+					borderBottom: '1px solid #d1d7dc',
 				}}
+				elevation={0}
 			>
-				<Toolbar sx={{ justifyContent: 'space-between' }}>
-					<Box sx={{ display: 'flex', alignItems: 'center' }}>
-						{!open && (
-							<IconButton
-								color="inherit"
-								aria-label="open drawer"
-								onClick={handleDrawerToggle}
-								edge="start"
-								sx={{ mr: 2 }}
-							>
-								<MenuIcon />
-							</IconButton>
-						)}
-						<Typography variant="h6" noWrap component="div" sx={{ fontWeight: 500, display: { xs: 'none', sm: 'block' } }}>
-							{menuItems.find(item => item.path === location.pathname)?.text || 'Dashboard'}
+				<Toolbar sx={{ height: 72, px: { xs: 2, md: 4 }, gap: 2 }}>
+					{isMobile && (
+						<IconButton
+							color="inherit"
+							aria-label="open drawer"
+							onClick={handleDrawerToggle}
+							edge="start"
+							sx={{ mr: 1 }}
+						>
+							<MenuIcon />
+						</IconButton>
+					)}
+					
+					{/* Logo */}
+					<Box 
+						sx={{ display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer', mr: 2 }}
+						onClick={() => navigate('/dashboard')}
+					>
+						<Typography variant="h5" sx={{ fontWeight: 800, color: '#1c1d1f' }}>
+							WinVinaya
 						</Typography>
 					</Box>
 
+					{!isMobile && (
+						<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
+							Categories
+						</Typography>
+					)}
+
+					{/* Search Bar */}
+					<Paper
+						component="form"
+						sx={{
+							p: '2px 4px',
+							display: 'flex',
+							alignItems: 'center',
+							flexGrow: 1,
+							bgcolor: '#f7f9fa',
+							borderRadius: 50,
+							border: '1px solid #1c1d1f',
+							maxWidth: 600,
+							height: 48,
+							boxShadow: 'none'
+						}}
+					>
+						<IconButton sx={{ p: '10px' }} aria-label="search">
+							<SearchIcon sx={{ fontSize: 20 }} />
+						</IconButton>
+						<InputBase
+							sx={{ ml: 1, flex: 1, fontSize: '0.875rem' }}
+							placeholder="Search for anything"
+							inputProps={{ 'aria-label': 'search for anything' }}
+						/>
+					</Paper>
+
+					{!isMobile && (
+						<Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+							<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
+								Udemy Business
+							</Typography>
+							<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>
+								Teach on WinVinaya
+							</Typography>
+						</Box>
+					)}
+
+					<Box sx={{ flexGrow: 1 }} />
+
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-						<Tooltip title="Search">
-							<IconButton color="inherit">
-								<SearchIcon />
-							</IconButton>
-						</Tooltip>
-						<Tooltip title="Notifications">
-							<IconButton color="inherit">
-								<NotificationsIcon />
-							</IconButton>
-						</Tooltip>
+						{!isMobile && (
+							<>
+								<Tooltip title="Favorites">
+									<IconButton color="inherit">
+										<FavoriteBorderIcon />
+									</IconButton>
+								</Tooltip>
+								<Tooltip title="Shopping Cart">
+									<IconButton color="inherit">
+										<ShoppingBagIcon />
+									</IconButton>
+								</Tooltip>
+								<Tooltip title="Notifications">
+									<IconButton color="inherit">
+										<NotificationsIcon />
+									</IconButton>
+								</Tooltip>
+							</>
+						)}
+
 						<IconButton
 							onClick={handleMenuOpen}
 							sx={{ p: 0.5 }}
-							aria-controls="user-menu"
-							aria-haspopup="true"
 						>
 							<Avatar 
-								sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.875rem' }}
+								sx={{ 
+									width: 32, 
+									height: 32, 
+									bgcolor: '#1c1d1f', 
+									fontSize: '0.875rem',
+									borderRadius: '50%'
+								}}
 							>
 								{user?.email?.charAt(0).toUpperCase() || 'U'}
 							</Avatar>
 						</IconButton>
 						<Menu
-							id="user-menu"
 							anchorEl={anchorEl}
 							open={Boolean(anchorEl)}
 							onClose={handleMenuClose}
-							transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-							anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+							PaperProps={{
+								sx: { borderRadius: 0, mt: 1.5, minWidth: 200, boxShadow: '0 2px 4px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.08)' }
+							}}
 						>
-							<Box sx={{ px: 2, py: 1 }}>
-								<Typography variant="subtitle2" noWrap>{user?.email}</Typography>
-								<Typography variant="caption" color="text.secondary" noWrap>
-									{user?.role?.toUpperCase() || 'USER'}
-								</Typography>
+							<Box sx={{ px: 2, py: 2 }}>
+								<Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 1 }}>
+									<Avatar sx={{ width: 48, height: 48, bgcolor: '#1c1d1f' }}>
+										{user?.email?.charAt(0).toUpperCase()}
+									</Avatar>
+									<Box>
+										<Typography variant="subtitle1" sx={{ lineHeight: 1.2 }}>{user?.full_name || 'User'}</Typography>
+										<Typography variant="caption" color="text.secondary">{user?.email}</Typography>
+									</Box>
+								</Box>
 							</Box>
 							<Divider />
-							<MenuItem onClick={handleMenuClose}>
-								<ListItemIcon><PersonIcon fontSize="small" /></ListItemIcon>
-								Profile
-							</MenuItem>
-							<MenuItem onClick={handleLogout}>
-								<ListItemIcon><LogoutIcon fontSize="small" /></ListItemIcon>
-								Logout
-							</MenuItem>
+							<MenuItem onClick={() => navigate('/dashboard')} sx={{ py: 1.5 }}>My learning</MenuItem>
+							<MenuItem onClick={() => navigate('/cart')} sx={{ py: 1.5 }}>My cart</MenuItem>
+							<MenuItem onClick={() => navigate('/wishlist')} sx={{ py: 1.5 }}>Wishlist</MenuItem>
+							<Divider />
+							<MenuItem onClick={() => navigate('/notifications')} sx={{ py: 1.5 }}>Notifications</MenuItem>
+							<MenuItem onClick={() => navigate('/messages')} sx={{ py: 1.5 }}>Messages</MenuItem>
+							<Divider />
+							<MenuItem onClick={() => navigate('/settings')} sx={{ py: 1.5 }}>Account settings</MenuItem>
+							<MenuItem onClick={() => navigate('/payment-methods')} sx={{ py: 1.5 }}>Payment methods</MenuItem>
+							<Divider />
+							<MenuItem onClick={handleLogout} sx={{ py: 1.5, fontWeight: 700, color: 'primary.main' }}>Log out</MenuItem>
 						</Menu>
 					</Box>
 				</Toolbar>
 			</AppBar>
 
 			<Drawer
-				variant={isMobile ? "temporary" : "permanent"}
-				open={open}
-				onClose={isMobile ? handleDrawerToggle : undefined}
+				variant="temporary"
+				open={mobileOpen}
+				onClose={handleDrawerToggle}
+				ModalProps={{ keepMounted: true }}
 				sx={{
-					width: drawerWidth,
-					flexShrink: 0,
-					[`& .MuiDrawer-paper`]: {
-						width: drawerWidth,
-						boxSizing: 'border-box',
-						...(!open && !isMobile && {
-							width: theme.spacing(7),
-							overflowX: 'hidden',
-						})
-					},
+					display: { xs: 'block', md: 'none' },
+					'& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, borderRadius: 0 },
 				}}
 			>
 				{drawer}
@@ -245,14 +291,11 @@ const MainLayout: React.FC = () => {
 				component="main"
 				sx={{
 					flexGrow: 1,
-					p: 3,
-					width: { sm: `calc(100% - ${drawerWidth}px)` },
 					minHeight: '100vh',
-					backgroundColor: '#f2f3f3'
+					pt: '72px',
+					bgcolor: '#ffffff'
 				}}
 			>
-				<Toolbar />
-				<Breadcrumbs />
 				<Outlet />
 			</Box>
 		</Box>

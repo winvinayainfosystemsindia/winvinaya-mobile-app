@@ -1,118 +1,139 @@
 import { createTheme } from '@mui/material/styles';
 
+/**
+ * Udemy-style Theme Configuration
+ * Colors:
+ * - Primary: #a435f0 (Purple)
+ * - Secondary: #2d2f31 (Dark Gray)
+ * - Error: #e44848 (Muted Red)
+ * - Background: #ffffff
+ * - Border: #d1d7dc
+ */
 const theme = createTheme({
 	palette: {
 		primary: {
-			main: '#ec7211', // AWS Orange-ish
+			main: '#a435f0',
+			contrastText: '#ffffff',
 		},
 		secondary: {
-			main: '#232f3e', // AWS Dark Blue
+			main: '#2d2f31',
+			contrastText: '#ffffff',
 		},
 		background: {
-			default: '#f2f3f3', // Light gray background
+			default: '#ffffff',
 			paper: '#ffffff',
 		},
 		text: {
-			primary: '#16191f',
-			secondary: '#545b64',
-		}
+			primary: '#1c1d1f',
+			secondary: '#6a6f73',
+		},
+		divider: '#d1d7dc',
 	},
 	typography: {
-		fontFamily: '"Amazon Ember", "Helvetica Neue", "Helvetica", "Arial", sans-serif',
+		fontFamily: '"Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, Roboto, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
 		h4: {
-			fontWeight: 300,
-			fontSize: '1.75rem',
-			'@media (min-width:600px)': {
-				fontSize: '2.125rem',
-			},
+			fontWeight: 700,
+			fontSize: '2rem',
+			color: '#1c1d1f',
 		},
 		h5: {
 			fontWeight: 700,
-			fontSize: '1.25rem',
-			'@media (min-width:600px)': {
-				fontSize: '1.5rem',
-			},
+			fontSize: '1.5rem',
+			color: '#1c1d1f',
 		},
 		h6: {
 			fontWeight: 700,
+			fontSize: '1.2rem',
+			color: '#1c1d1f',
+		},
+		subtitle1: {
+			fontWeight: 700,
 			fontSize: '1rem',
-			'@media (min-width:600px)': {
-				fontSize: '1.25rem',
-			},
+		},
+		subtitle2: {
+			fontWeight: 400,
+			fontSize: '0.9rem',
 		},
 		button: {
 			textTransform: 'none',
 			fontWeight: 700,
+			fontSize: '1rem',
 		},
 		body1: {
-			fontSize: '0.875rem',
-			'@media (min-width:600px)': {
-				fontSize: '1rem',
-			},
+			fontSize: '1rem',
+			lineHeight: 1.4,
 		},
 		body2: {
-			fontSize: '0.75rem',
-			'@media (min-width:600px)': {
-				fontSize: '0.875rem',
-			},
+			fontSize: '0.875rem',
+			lineHeight: 1.4,
 		},
 	},
-	spacing: 8, // Basline 8px spacing
-	breakpoints: {
-		values: {
-			xs: 0,
-			sm: 600,
-			md: 960,
-			lg: 1280,
-			xl: 1920,
-		},
+	shape: {
+		borderRadius: 0, // Udemy uses very sharp corners for a professional look
 	},
 	components: {
 		MuiButton: {
 			styleOverrides: {
 				root: {
-					borderRadius: 2, // Slightly more squared
+					padding: '12px 20px',
+					borderRadius: 0,
+					height: '48px',
 				},
 				containedPrimary: {
+					backgroundColor: '#a435f0',
 					'&:hover': {
-						backgroundColor: '#eb5f07',
-					}
-				}
+						backgroundColor: '#8710d8',
+					},
+				},
+				outlinedPrimary: {
+					borderColor: '#1c1d1f',
+					color: '#1c1d1f',
+					borderWidth: '1px',
+					'&:hover': {
+						backgroundColor: 'rgba(28, 29, 31, 0.04)',
+						borderColor: '#1c1d1f',
+						borderWidth: '1px',
+					},
+				},
 			},
 			defaultProps: {
 				disableElevation: true,
-			}
+			},
 		},
 		MuiAppBar: {
-			defaultProps: {
-				elevation: 0,
-			}
-		},
-		MuiDrawer: {
 			styleOverrides: {
-				paper: {
-					backgroundColor: '#f2f3f3',
-					borderRight: '1px solid #d5dbdb',
-				}
-			}
-		},
-		MuiCssBaseline: {
-			styleOverrides: {
-				html: {
-					scrollBehavior: 'smooth',
+				root: {
+					backgroundColor: '#ffffff',
+					color: '#1c1d1f',
+					boxShadow: '0 2px 4px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.08)',
+					height: '72px',
+					justifyContent: 'center',
 				},
-				body: {
-					scrollbarColor: "#6b7a90 #f2f3f3",
-					"&::-webkit-scrollbar, & *::-webkit-scrollbar": {
-						backgroundColor: "#f2f3f3",
-						width: '8px',
-						height: '8px',
+			},
+		},
+		MuiCard: {
+			styleOverrides: {
+				root: {
+					borderRadius: 0,
+					border: '1px solid #d1d7dc',
+					boxShadow: 'none',
+					'&:hover': {
+						cursor: 'pointer',
 					},
-					"&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb": {
-						borderRadius: 8,
-						backgroundColor: "#6b7a90",
-						minHeight: 24,
-						border: "2px solid #f2f3f3",
+				},
+			},
+		},
+		MuiTextField: {
+			styleOverrides: {
+				root: {
+					'& .MuiOutlinedInput-root': {
+						borderRadius: 0,
+						'& fieldset': {
+							borderColor: '#1c1d1f',
+						},
+						'&:hover fieldset': {
+							borderColor: '#1c1d1f',
+						},
 					},
 				},
 			},
