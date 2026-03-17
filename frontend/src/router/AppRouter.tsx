@@ -11,11 +11,14 @@ const AppRouter: React.FC = () => {
 	return (
 		<Routes>
 			{/* Layout wraps everything to provide global header */}
+			{/* Auth Routes (No Navbar) */}
+			<Route path="/login" element={<Login />} />
+			<Route path="/register" element={<Register />} />
+
+			{/* Layout wraps everything else to provide global header */}
 			<Route element={<MainLayout />}>
 				{/* Public Routes */}
 				<Route path="/" element={<Home />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/register" element={<Register />} />
 
 				{/* Protected Routes */}
 				<Route element={<ProtectedRoute />}>
