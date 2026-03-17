@@ -178,12 +178,25 @@ class VideoService:
         else:
             headers["Content-Length"] = str(file_size)
 
-        return StreamingResponse(
-            storage_service.stream(media.storage_path, start, end),
-            status_code=status_code,
-            headers=headers,
-            media_type=media.mime_type or "video/mp4",
-        )
+    async def cleanup_video(self, media: MediaFile) -> None:
+        """
+        Delete all files associated with a video:
+        - original/
+        - hls/
+        - thumbs/
+        """
+        # 1. Delete original file
+        await storage_service.delete(media.storage_path)
+
+        # 2. Delete HLS dir
+        hls_base = media.storage_path.replace("/original/", "/hls/").rsplit("/", 1)[0]
+        if storage_service.exists(hls_base):
+            await storage_service.delete(hls_base)
+
+        # 3. Delete thumbs dir
+        thumb_base = media.storage_path.replace("/original/", "/thumbs/").rsplit("/", 1)[0]
+        if storage_service.exists(thumb_base):
+            await storage_service.delete(thumb_base)
 
 
 video_service = VideoService()

@@ -263,5 +263,10 @@ async def delete_media(
     media = await media_repository.get(db, media_id)
     if not media:
         raise NotFoundError("Media file")
-    await storage_service.delete(media.storage_path)
+
+    if media.media_type == MediaType.video:
+        await video_service.cleanup_video(media)
+    else:
+        await storage_service.delete(media.storage_path)
+
     await media_repository.remove(db, id=media_id)
