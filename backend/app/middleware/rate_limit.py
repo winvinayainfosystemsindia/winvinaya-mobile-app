@@ -29,15 +29,23 @@ def get_rate_limit_key(request) -> str:
     return get_remote_address(request)
 
 
-# Build the Redis storage URI for slowapi (uses DB 3, separate from Celery and cache)
-_redis_storage_uri = settings.REDIS_URL.rsplit("/", 1)[0] + "/3"
-
 # ── Global limiter instance ────────────────────────────────────────────────────
-limiter = Limiter(
-    key_func=get_rate_limit_key,
-    default_limits=["200/minute"],
-    storage_uri=_redis_storage_uri,
-)
+if settings.USE_REDIS:
+    # Build the Redis storage URI (uses DB 3)
+    _redis_storage_uri = settings.REDIS_URL.rsplit("/", 1)[0] + "/3"
+    limiter = Limiter(
+        key_func=get_rate_limit_key,
+        default_limits=["200/minute"],
+        storage_uri=_redis_storage_uri,
+    )
+else:
+    # Fallback to In-Memory storage for local dev without Redis
+    from limits.storage import MemoryStorage
+    limiter = Limiter(
+        key_func=get_rate_limit_key,
+        default_limits=["200/minute"],
+        storage_uri="memory://",
+    )
 
 # ── Reusable limit strings ─────────────────────────────────────────────────────
 LIMIT_AUTH = "10/minute"       # Login / register

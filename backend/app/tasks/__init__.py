@@ -3,14 +3,29 @@ from app.core.config import settings
 
 # ─── Celery Application ──────────────────────────────────────────────────────
 
-celery_app = Celery(
-    "lms_worker",
-    broker=settings.CELERY_BROKER_URL,
-    backend=settings.CELERY_RESULT_BACKEND,
-    include=[
-        "app.tasks.video_processing",
-    ],
-)
+if settings.USE_REDIS:
+    celery_app = Celery(
+        "lms_worker",
+        broker=settings.CELERY_BROKER_URL,
+        backend=settings.CELERY_RESULT_BACKEND,
+        include=[
+            "app.tasks.video_processing",
+        ],
+    )
+else:
+    # Redis-less fallback: synchronous execution (no worker process needed)
+    celery_app = Celery(
+        "lms_worker",
+        broker="memory://",
+        backend="cache+memory://",
+        include=[
+            "app.tasks.video_processing",
+        ],
+    )
+    celery_app.conf.update(
+        task_always_eager=True,
+        task_eager_propagates=True,
+    )
 
 celery_app.conf.update(
     task_serializer="json",
@@ -22,6 +37,6 @@ celery_app.conf.update(
         "app.tasks.video_processing.*": {"queue": "video"},
         "*": {"queue": "default"},
     },
-    worker_prefetch_multiplier=1,  # Fair task distribution for long-running video tasks
-    task_acks_late=True,           # Re-queue on worker crash
+    worker_prefetch_multiplier=1,
+    task_acks_late=True,
 )
