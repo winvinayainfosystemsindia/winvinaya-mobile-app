@@ -9,6 +9,7 @@ import MainLayout from '../components/layout/MainLayout';
 import AdminCourseCreate from '../pages/AdminCourseCreate';
 import AdminCourseEdit from '../pages/AdminCourseEdit';
 import CourseDetail from '../pages/CourseDetail';
+import CoursePlayer from '../pages/CoursePlayer';
 
 const AppRouter: React.FC = () => {
 	return (
@@ -27,6 +28,7 @@ const AppRouter: React.FC = () => {
 				<Route element={<ProtectedRoute />}>
 					<Route path="/dashboard" element={<Dashboard />} />
 					<Route path="/courses/:courseId" element={<CourseDetail />} />
+					<Route path="/courses/:courseId/learn" element={<CoursePlayer />} />
 					<Route path="/candidates" element={<Navigate to="/dashboard" replace />} />
 					<Route path="/training" element={<Navigate to="/dashboard" replace />} />
 					<Route path="/allocations" element={<Navigate to="/dashboard" replace />} />

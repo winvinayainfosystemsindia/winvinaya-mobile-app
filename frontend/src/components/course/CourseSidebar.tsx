@@ -19,6 +19,9 @@ import {
   DescriptionOutlined,
   LockOutlined,
   CheckCircle,
+  SlideshowOutlined,
+  CodeOutlined,
+  SlowMotionVideoOutlined,
 } from '@mui/icons-material';
 import type { Course, Module, Lesson } from '../../models/course';
 import { type CourseProgress, ProgressStatus } from '../../models/progress';
@@ -48,6 +51,8 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
 
   const checkIsLocked = (lesson: Lesson, allLessons: Lesson[]) => {
     // Admins/Instructors are never locked out (handled in parent usually, but good to have here)
+    if (!course.require_sequential) return false;
+
     const currentIndex = allLessons.findIndex(l => l.id === lesson.id);
     if (currentIndex === 0) return false;
 
@@ -115,6 +120,12 @@ const CourseSidebar: React.FC<CourseSidebarProps> = ({
                           <QuizOutlined />
                         ) : lesson.content_type === 'assignment' ? (
                           <AssignmentOutlined />
+                        ) : lesson.content_type === 'ppt' ? (
+                          <SlideshowOutlined />
+                        ) : lesson.content_type === 'code' ? (
+                          <CodeOutlined />
+                        ) : lesson.content_type === 'interactive_video' ? (
+                          <SlowMotionVideoOutlined />
                         ) : (
                           <DescriptionOutlined />
                         )}

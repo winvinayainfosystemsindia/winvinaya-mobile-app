@@ -67,6 +67,22 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
               onComplete={onQuizComplete}
             />
           </Box>
+        ) : lesson.content_type === 'ppt' ? (
+          <Box sx={{ p: 0, bgcolor: '#f7f9fa' }}>
+             {/* Placeholder for PPT Viewer - will show converted slide images */}
+             <Box sx={{ p: 4, textAlign: 'center' }}>
+                <Typography variant="h6">PPT Presentation</Typography>
+                <Typography color="text.secondary">Slide images will be displayed here.</Typography>
+             </Box>
+          </Box>
+        ) : lesson.content_type === 'code' ? (
+          <Box sx={{ p: 0, bgcolor: '#1e1e1e', height: 500 }}>
+             {/* Placeholder for Code Editor / Sandbox */}
+             <Box sx={{ p: 4, color: '#fff' }}>
+                <Typography variant="h6">Coding Exercise</Typography>
+                <Typography sx={{ opacity: 0.7 }}>Interactive code editor will be available here.</Typography>
+             </Box>
+          </Box>
         ) : (
           <Box sx={{ p: 4, bgcolor: '#fff', minHeight: 400 }}>
             <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>

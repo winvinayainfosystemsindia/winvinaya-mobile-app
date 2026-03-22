@@ -43,7 +43,13 @@ const QuizPlayer: React.FC<QuizPlayerProps> = ({ quizId, onComplete }) => {
     const fetchQuizData = async () => {
       try {
         setLoading(true);
-        const data = await contentService.getQuiz(quizId);
+        // Try getting quiz by direct ID first, if failure, try by lesson ID
+        let data;
+        try {
+          data = await contentService.getQuiz(quizId);
+        } catch {
+          data = await contentService.getQuizByLesson(quizId);
+        }
         setQuiz(data);
       } catch (err) {
         setError('Failed to load quiz content.');
@@ -70,8 +76,9 @@ const QuizPlayer: React.FC<QuizPlayerProps> = ({ quizId, onComplete }) => {
 
   const handleSubmit = async () => {
     try {
+      if (!quiz) return;
       setIsSubmitting(true);
-      const result = await contentService.submitQuiz(quizId, answers);
+      const result = await contentService.submitQuiz(quiz.id, answers);
       setAttempt(result);
       setCurrentStep(quiz?.questions.length || 0);
       if (onComplete) onComplete(result);

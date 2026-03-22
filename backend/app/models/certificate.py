@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime, UniqueConstraint, Boolean, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -27,3 +27,17 @@ class Certificate(Base):
     # Relationships
     user = relationship("User", back_populates="certificates")
     course = relationship("Course", back_populates="certificates")
+
+
+class CertificateTemplate(Base):
+    __tablename__ = "certificate_templates"
+
+    id = Column(Integer, primary_key=True, index=True)
+    course_id = Column(Integer, ForeignKey("courses.id", ondelete="SET NULL"), nullable=True)
+    is_default = Column(Boolean, default=False)
+    html_template = Column(Text, nullable=False)  # Jinja2 HTML
+    
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # Relationships
+    course = relationship("Course")

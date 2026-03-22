@@ -58,6 +58,9 @@ class CourseBase(BaseModel):
     tags: Optional[str] = None
     is_free: bool = False
     price: int = 0
+    require_sequential: Optional[bool] = False
+    expiry_days: Optional[int] = None
+    passing_score: Optional[float] = 0.0
 
 class CourseUpdate(BaseModel):
     title: Optional[str] = None
@@ -83,6 +86,8 @@ class CourseResponse(CourseBase):
     duration_minutes: int
     instructor_id: int
     is_featured: bool
+    rating_avg: Optional[float] = 0.0
+    rating_count: Optional[int] = 0
     created_at: datetime
     modules: List[ModuleResponse] = []
     class Config:

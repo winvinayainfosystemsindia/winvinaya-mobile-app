@@ -1,7 +1,7 @@
 import uuid
 import enum
 from sqlalchemy import (
-    Column, Integer, String, Text, ForeignKey, DateTime, Enum, Boolean
+    Column, Integer, String, Text, ForeignKey, DateTime, Enum, Boolean, Float
 )
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
@@ -48,6 +48,13 @@ class Course(Base):
     is_free = Column(Boolean, default=False)
     price = Column(Integer, default=0)  # in paisa/cents
 
+    # NEW: Advanced settings
+    expiry_days = Column(Integer, nullable=True)  # NULL = infinite
+    require_sequential = Column(Boolean, default=False)
+    passing_score = Column(Float, default=60.0)
+    rating_avg = Column(Float, default=0.0)
+    rating_count = Column(Integer, default=0)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -83,6 +90,9 @@ class LessonContentType(str, enum.Enum):
     quiz = "quiz"
     assignment = "assignment"
     text = "text"
+    ppt = "ppt"
+    code = "code"
+    interactive_video = "interactive_video"
 
 
 class Lesson(Base):

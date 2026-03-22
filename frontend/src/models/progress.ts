@@ -11,6 +11,7 @@ export interface LessonProgress {
   lesson_id: number;
   user_id: number;
   status: ProgressStatus;
+  video_position_seconds?: number;
   completed_at?: string;
 }
 

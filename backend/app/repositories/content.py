@@ -1,6 +1,7 @@
-from typing import List, Optional
+from typing import List, Optional, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.repositories.base import BaseRepository
 from app.models.content import Quiz, QuizQuestion, MatchingPair, Assignment, QuizAttempt
 from app.schemas.content import (
@@ -12,15 +13,29 @@ from app.schemas.content import (
 )
 
 class QuizRepository(BaseRepository[Quiz, QuizCreate, QuizUpdate]):
-    async def get_by_lesson(self, db: AsyncSession, lesson_id: int) -> Optional[Quiz]:
-        result = await db.execute(select(self.model).filter(self.model.lesson_id == lesson_id))
+    async def get(self, db: AsyncSession, id: Any) -> Optional[Quiz]:
+        result = await db.execute(
+            select(self.model)
+            .filter(self.model.id == id)
+            .options(selectinload(self.model.questions).selectinload(QuizQuestion.matching_pairs))
+        )
         return result.scalars().first()
+
+    async def get_by_lesson(self, db: AsyncSession, lesson_id: int) -> Optional[Quiz]:
+        result = await db.execute(
+            select(self.model)
+            .filter(self.model.lesson_id == lesson_id)
+            .options(selectinload(self.model.questions).selectinload(QuizQuestion.matching_pairs))
+        )
+        quiz = result.scalars().first()
+        return quiz
 
 class QuizQuestionRepository(BaseRepository[QuizQuestion, QuizQuestionCreate, QuizQuestionUpdate]):
     async def get_by_quiz(self, db: AsyncSession, quiz_id: int) -> List[QuizQuestion]:
         result = await db.execute(
             select(self.model)
             .filter(self.model.quiz_id == quiz_id)
+            .options(selectinload(self.model.matching_pairs))
             .order_by(self.model.order)
         )
         return result.scalars().all()

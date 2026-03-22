@@ -181,7 +181,7 @@ const AdminCourseEdit: React.FC = () => {
 
       // Save Quiz if applicable
       if (savedLesson.content_type === 'quiz' && editingQuiz) {
-        console.log('Quiz data saved via editor state.');
+        await contentService.saveQuiz(savedLesson.id!, editingQuiz);
       }
 
       setLessonDialogOpen(false);
@@ -330,7 +330,20 @@ const AdminCourseEdit: React.FC = () => {
         <DialogTitle>{editingLesson?.id ? 'Edit Lesson' : 'New Lesson'}</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
           <TextField fullWidth label="Lesson Title" value={editingLesson?.title || ''} onChange={e => setEditingLesson(prev => prev ? { ...prev, title: e.target.value } : null)} />
-          <TextField select fullWidth label="Content Type" value={editingLesson?.content_type || 'video'} onChange={e => setEditingLesson(prev => prev ? { ...prev, content_type: e.target.value as any } : null)}>
+          <TextField select fullWidth label="Content Type" value={editingLesson?.content_type || 'video'} onChange={e => {
+            const newType = e.target.value as any;
+            setEditingLesson(prev => prev ? { ...prev, content_type: newType } : null);
+            if (newType === 'quiz' && !editingQuiz) {
+              setEditingQuiz({
+                id: 0,
+                lesson_id: editingLesson?.id || 0,
+                title: editingLesson?.title || '',
+                pass_score: 80,
+                max_attempts: 3,
+                questions: []
+              });
+            }
+          }}>
             <MenuItem value="video">Video</MenuItem>
             <MenuItem value="text">Text / Article</MenuItem>
             <MenuItem value="quiz">Quiz</MenuItem>

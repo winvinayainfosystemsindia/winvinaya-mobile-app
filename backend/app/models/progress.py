@@ -26,6 +26,7 @@ class LessonProgress(Base):
 
     status = Column(Enum(LessonProgressStatus), default=LessonProgressStatus.not_started, nullable=False)
     watch_duration_seconds = Column(Integer, default=0)  # For video lessons
+    video_position_seconds = Column(Integer, default=0)  # Resume position
     score = Column(Float, nullable=True)  # For quiz lessons
 
     completed_at = Column(DateTime(timezone=True), nullable=True)

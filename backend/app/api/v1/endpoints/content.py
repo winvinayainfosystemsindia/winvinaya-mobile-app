@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.core.dependencies import get_current_user
 from app.schemas.content import (
-    QuizCreate, QuizResponse, QuizQuestionCreate, QuizQuestionResponse,
+    QuizCreate, QuizUpdate, QuizResponse, QuizQuestionCreate, QuizQuestionResponse,
     QuizAttemptCreate, QuizAttemptResponse
 )
 from app.services.content import quiz_service
@@ -43,6 +43,15 @@ async def get_quiz_by_lesson(
         raise HTTPException(status_code=404, detail="Quiz not found for this lesson")
     return quiz
 
+@router.patch("/{quiz_id}", response_model=QuizResponse)
+async def update_quiz(
+    quiz_id: int,
+    quiz_in: QuizUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    return await quiz_service.update_quiz(db, quiz_id, quiz_in)
+
 @router.post("/{quiz_id}/questions", response_model=QuizQuestionResponse)
 async def add_question(
     quiz_id: int,
@@ -59,9 +68,10 @@ async def submit_quiz(
     db: AsyncSession = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    if quiz_id != attempt_in.quiz_id:
-        raise HTTPException(status_code=400, detail="Quiz ID mismatch")
-    return await quiz_service.submit_attempt(db, current_user.id, attempt_in)
+    print(f"DEBUG API: Submitting quiz_id={quiz_id}")
+    result = await quiz_service.submit_attempt(db, current_user.id, attempt_in)
+    print(f"DEBUG API: result type={type(result)}, has questions? {hasattr(result, 'questions')}")
+    return result
 
 @router.get("/{quiz_id}/attempts", response_model=List[QuizAttemptResponse])
 async def get_my_attempts(

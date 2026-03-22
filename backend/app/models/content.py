@@ -16,6 +16,7 @@ class QuizQuestionType(str, enum.Enum):
     short_answer = "short_answer"
     match_the_following = "match_the_following"
     comprehensive = "comprehensive"
+    fill_in_blank = "fill_in_blank"
 
 
 class Quiz(Base):
@@ -53,6 +54,7 @@ class QuizQuestion(Base):
     image_id = Column(Integer, ForeignKey("media_files.id"), nullable=True)
     order = Column(Integer, default=0)
     points = Column(Integer, default=1)
+    shuffle_options = Column(Boolean, default=True)
 
     quiz = relationship("Quiz", back_populates="questions")
     image = relationship("MediaFile")
@@ -86,6 +88,8 @@ class QuizAttempt(Base):
     score = Column(Float, nullable=True)
     passed = Column(Boolean, nullable=True)
     attempt_number = Column(Integer, default=1)
+    time_taken_seconds = Column(Integer, nullable=True)
+    result_detail = Column(JSONB, nullable=True)  # list of {q_id, is_correct, etc.}
 
     started_at = Column(DateTime(timezone=True), server_default=func.now())
     submitted_at = Column(DateTime(timezone=True), nullable=True)

@@ -24,6 +24,23 @@ const contentService = {
     const response = await api.get(`/content/${quizId}/attempts`);
     return response.data;
   },
+
+  saveQuiz: async (lessonId: number, quizData: Partial<Quiz>): Promise<Quiz> => {
+    // Check if quiz exists for lesson
+    try {
+      const existing = await api.get(`/content/lesson/${lessonId}`);
+      if (existing.data) {
+        // Update (simplified: ideally we'd have a PATCH /content/{id})
+        const response = await api.patch(`/content/${existing.data.id}`, quizData);
+        return response.data;
+      }
+    } catch (err) {
+      // Create new
+      const response = await api.post('/content/', { ...quizData, lesson_id: lessonId });
+      return response.data;
+    }
+    return null as any;
+  },
 };
 
 export default contentService;

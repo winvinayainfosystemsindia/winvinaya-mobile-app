@@ -14,6 +14,12 @@ class EnrollmentStatus(str, enum.Enum):
     dropped = "dropped"
 
 
+class EnrollmentSource(str, enum.Enum):
+    self = "self"
+    admin = "admin"
+    group = "group"
+
+
 class Enrollment(Base):
     __tablename__ = "enrollments"
     __table_args__ = (
@@ -28,6 +34,9 @@ class Enrollment(Base):
     status = Column(Enum(EnrollmentStatus), default=EnrollmentStatus.active, nullable=False)
 
     progress_percent = Column(Float, default=0.0)
+    expiry_date = Column(DateTime(timezone=True), nullable=True)
+    source = Column(Enum(EnrollmentSource), default=EnrollmentSource.self, nullable=False)
+    group_id = Column(Integer, ForeignKey("groups.id", ondelete="SET NULL"), nullable=True)
 
     enrolled_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     completed_at = Column(DateTime(timezone=True), nullable=True)

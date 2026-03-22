@@ -61,6 +61,7 @@ class QuizBase(BaseModel):
 
 class QuizCreate(QuizBase):
     lesson_id: int
+    questions: Optional[List[QuizQuestionCreate]] = None
 
 class QuizUpdate(BaseModel):
     title: Optional[str] = None
@@ -68,6 +69,7 @@ class QuizUpdate(BaseModel):
     pass_score: Optional[float] = None
     time_limit_minutes: Optional[int] = None
     max_attempts: Optional[int] = None
+    questions: Optional[List[QuizQuestionCreate]] = None
 
 class QuizResponse(QuizBase):
     id: int
@@ -89,10 +91,11 @@ class QuizAttemptResponse(BaseModel):
     id: int
     quiz_id: int
     user_id: int
-    answers: Dict[int, Any]
+    answers: Optional[Dict[str, Any]] = None
     score: Optional[float] = None
     passed: Optional[bool] = None
     attempt_number: int
+    result_detail: Optional[List[Dict[str, Any]]] = None
     started_at: datetime
     submitted_at: Optional[datetime] = None
     class Config:

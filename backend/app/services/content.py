@@ -9,10 +9,24 @@ from app.repositories.content import (
 from app.schemas.content import (
     QuizCreate, QuizUpdate, QuizQuestionCreate, QuizAttemptCreate
 )
+from app.services.quiz_eval import QuizEvalService
 
 class QuizService:
     async def create_quiz(self, db: AsyncSession, quiz_in: QuizCreate) -> Quiz:
-        return await quiz_repository.create(db, obj_in=quiz_in)
+        # 1. Create Quiz metadata
+        quiz_data = quiz_in.model_dump(exclude={"questions"})
+        quiz = Quiz(**quiz_data)
+        db.add(quiz)
+        await db.flush()
+
+        # 2. Add Questions if any
+        if quiz_in.questions:
+            for q_in in quiz_in.questions:
+                await self.add_question(db, quiz.id, q_in)
+
+        await db.commit()
+        await db.refresh(quiz)
+        return quiz
 
     async def add_question(self, db: AsyncSession, quiz_id: int, question_in: QuizQuestionCreate) -> QuizQuestion:
         # 1. Create Question
@@ -37,73 +51,62 @@ class QuizService:
         if not quiz:
             raise HTTPException(status_code=404, detail="Quiz not found")
 
-        # 1. Calculate Score
-        questions = await quiz_question_repository.get_by_quiz(db, quiz.id)
-        total_points = sum(q.points for q in questions)
-        earned_points = 0.0
-        
-        # We'll store a detailed feedback object in the attempt or return it
-        # For now, we'll just store the score
-        for question in questions:
-            user_answer = attempt_in.answers.get(str(question.id)) or attempt_in.answers.get(question.id)
-            if not user_answer:
-                continue
-
-            is_correct = False
-            if question.question_type in [QuizQuestionType.mcq, QuizQuestionType.true_false]:
-                is_correct = str(user_answer).strip().lower() == str(question.correct_answer).strip().lower()
-            
-            elif question.question_type == QuizQuestionType.match_the_following:
-                # user_answer: {source_id: target_id/text} or list of pairs
-                # Logic: Compare vs MatchingPair table
-                pairs = await matching_pair_repository.get_by_question(db, question.id)
-                correct_count = 0
-                for pair in pairs:
-                    # Assuming user_answer is a dict {source_text: target_text} or {pair_id: target_text}
-                    # For simplicity, let's assume {source_text: target_text}
-                    if user_answer.get(pair.source_text) == pair.target_text:
-                        correct_count += 1
-                
-                # Full points only if all match (or partial credit logic)
-                if correct_count == len(pairs):
-                    is_correct = True
-                else:
-                    # Partial credit (optional)
-                    earned_points += (correct_count / len(pairs)) * question.points
-                    continue
-
-            if is_correct:
-                earned_points += question.points
-
-        score_percent = (earned_points / total_points * 100) if total_points > 0 else 0
-        passed = score_percent >= quiz.pass_score
+        # Use new QuizEvalService for robust scoring
+        eval_result = await QuizEvalService.evaluate_attempt(db, quiz, attempt_in.answers or {})
+        score_percent = eval_result["score"]
+        passed = eval_result["passed"]
 
         # 2. Determine Attempt Number
         prev_attempts = await quiz_attempt_repository.get_user_attempts(db, quiz.id, user_id)
         attempt_number = (prev_attempts[0].attempt_number + 1) if prev_attempts else 1
 
+        # 3. Create Attempt Record
+        attempt = QuizAttempt(
+            quiz_id=quiz.id,
+            user_id=user_id,
+            answers=attempt_in.answers,
+            score=score_percent,
+            passed=passed,
+            attempt_number=attempt_number,
+            result_detail=eval_result["detail"] # Store the detailed feedback
+        )
+        db.add(attempt)
+        await db.flush()
+
         # 4. Update Lesson Progress if passed
         if passed:
-            from app.repositories.progress import progress_repository
-            from app.models.progress import LessonProgress, LessonProgressStatus
-            
-            lp = await progress_repository.get_lesson_progress(db, user_id, quiz.lesson_id)
-            if not lp:
-                lp = LessonProgress(user_id=user_id, lesson_id=quiz.lesson_id)
-                db.add(lp)
-            
-            lp.status = LessonProgressStatus.completed
-            lp.score = score_percent
-            if not lp.completed_at:
-                from datetime import datetime
-                lp.completed_at = datetime.utcnow()
-            
-            # Recompute course progress
-            from app.api.v1.endpoints.progress import _recompute_course_progress
-            await _recompute_course_progress(db, user_id, quiz.lesson.module.course_id)
+            from app.services.progress import ProgressService
+            await ProgressService.mark_lesson_complete(db, user_id, quiz.lesson_id, score=score_percent)
 
         await db.commit()
         await db.refresh(attempt)
+        print(f"DEBUG SERVICE: Returning attempt of type={type(attempt)} for quiz_id={attempt.quiz_id}")
         return attempt
+
+    async def update_quiz(self, db: AsyncSession, quiz_id: int, quiz_in: QuizUpdate) -> Quiz:
+        quiz = await quiz_repository.get(db, id=quiz_id)
+        if not quiz:
+            raise HTTPException(status_code=404, detail="Quiz not found")
+
+        # 1. Update Quiz metadata
+        update_data = quiz_in.model_dump(exclude={"questions"}, exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(quiz, field, value)
+
+        # 2. Sync Questions if provided
+        if quiz_in.questions is not None:
+            from sqlalchemy import delete
+            # Clear existing questions (simple sync for Phase 1)
+            await db.execute(delete(QuizQuestion).where(QuizQuestion.quiz_id == quiz_id))
+            
+            for q_in in quiz_in.questions:
+                # Type cast/convert to QuizQuestionCreate for add_question
+                # (Assuming they are compatible enough for this flow)
+                q_create = QuizQuestionCreate(**q_in.model_dump(exclude_unset=True))
+                await self.add_question(db, quiz_id, q_create)
+
+        await db.commit()
+        await db.refresh(quiz)
+        return quiz
 
 quiz_service = QuizService()

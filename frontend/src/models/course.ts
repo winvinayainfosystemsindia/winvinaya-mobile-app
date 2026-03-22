@@ -2,7 +2,7 @@ export interface Lesson {
   id?: number;
   title: string;
   description?: string;
-  content_type: 'video' | 'document' | 'text' | 'quiz' | 'assignment';
+  content_type: 'video' | 'document' | 'text' | 'quiz' | 'assignment' | 'ppt' | 'code' | 'interactive_video';
   media_file_id?: number;
   text_content?: string;
   content_url?: string;
@@ -32,5 +32,10 @@ export interface Course {
   instructor_id?: number;
   status?: string;
   thumbnail_url?: string;
+  expiry_days?: number;
+  require_sequential?: boolean;
+  passing_score?: number;
+  rating_avg?: number;
+  rating_count?: number;
   modules: Module[];
 }
