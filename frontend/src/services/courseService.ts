@@ -3,6 +3,7 @@ import api from './api';
 export interface Lesson {
   id?: number;
   title: string;
+  description?: string;
   content_type: string;
   media_file_id?: number;
   text_content?: string;
@@ -62,6 +63,53 @@ export const courseService = {
 
   getCourses: async () => {
     const response = await api.get('/courses');
+    return response.data;
+  },
+
+  updateCourse: async (courseId: number, courseData: Partial<Course>) => {
+    const response = await api.patch(`/courses/${courseId}`, courseData);
+    return response.data;
+  },
+
+  updateModule: async (moduleId: number, moduleData: Partial<Module>) => {
+    const response = await api.patch(`/courses/modules/${moduleId}`, moduleData);
+    return response.data;
+  },
+
+  updateLesson: async (lessonId: number, lessonData: Partial<Lesson>) => {
+    const response = await api.patch(`/courses/lessons/${lessonId}`, lessonData);
+    return response.data;
+  },
+
+  uploadVideo: async (
+    courseId: number,
+    moduleId: number,
+    lessonId: number,
+    file: File,
+    onProgress?: (progress: number) => void
+  ) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('course_id', courseId.toString());
+    formData.append('module_id', moduleId.toString());
+    formData.append('lesson_id', lessonId.toString());
+
+    const response = await api.post('/media/video', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress && progressEvent.total) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percentCompleted);
+        }
+      },
+    });
+    return response.data;
+  },
+
+  getVideoStreamUrl: async (mediaId: number) => {
+    const response = await api.get(`/media/${mediaId}/share-url`);
     return response.data;
   },
 };

@@ -133,6 +133,46 @@ async def create_share_token(
 
 
 @router.get(
+    "/{media_id}/share-url",
+    summary="Get a signed, time-limited share URL for a video by its integer ID",
+)
+async def get_video_share_url(
+    media_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """
+    Returns a signed token and stream URLs for a video, identifying it by its internal integer ID.
+    Used by the Course Detail page to fetch the URL for the current lesson's video.
+    """
+    media = await media_repository.get(db, media_id)
+    if not media or media.media_type != MediaType.video:
+        raise NotFoundError("Video")
+    
+    if media.status != MediaStatus.ready and media.status != MediaStatus.processing:
+        raise HTTPException(status_code=400, detail=f"Video status is {media.status}")
+
+    token = _make_share_token(str(media.public_id))
+    stream_url = f"{settings.BASE_URL}{settings.API_V1_PREFIX}/media/stream/{token}"
+    hls_url = None
+    
+    # Check HLS master manifest
+    hls_path = media.storage_path.replace("original/", "hls/").rsplit("/", 1)[0] + "/master.m3u8"
+    if storage_service.exists(hls_path):
+        hls_url = f"{settings.BASE_URL}{settings.API_V1_PREFIX}/media/stream/{token}?format=hls"
+
+    return {
+        "media_id": media.id,
+        "public_id": media.public_id,
+        "status": media.status,
+        "share_token": token,
+        "stream_url": stream_url,
+        "hls_url": hls_url,
+        "expires_in_seconds": settings.SHARE_TOKEN_TTL_SECONDS,
+    }
+
+
+@router.get(
     "/stream/{share_token}",
     summary="Public video stream via signed share token (embeddable in external LMS)",
     include_in_schema=True,

@@ -140,20 +140,6 @@ class VideoService:
         if not storage_service.exists(media.storage_path):
             raise StorageError("Video file not found on disk.")
 
-        # Check if HLS master playlist exists (preferred for ABR streaming)
-        hls_path = media.storage_path.replace("/original/", "/hls/").rsplit("/", 1)[0] + "/master.m3u8"
-        if storage_service.exists(hls_path):
-            file_size = storage_service.get_size(hls_path)
-            return StreamingResponse(
-                storage_service.stream(hls_path, 0, file_size - 1),
-                status_code=200,
-                media_type="application/vnd.apple.mpegurl",
-                headers={
-                    "Cache-Control": "no-cache",
-                    "X-Stream-Type": "hls",
-                },
-            )
-
         # Fall back to raw MP4 byte-range stream
         file_size = storage_service.get_size(media.storage_path)
         start = 0
@@ -177,6 +163,13 @@ class VideoService:
                 pass
         else:
             headers["Content-Length"] = str(file_size)
+
+        return StreamingResponse(
+            storage_service.stream(media.storage_path, start, end),
+            status_code=status_code,
+            media_type=headers["Content-Type"],
+            headers=headers,
+        )
 
     async def cleanup_video(self, media: MediaFile) -> None:
         """

@@ -26,7 +26,8 @@ import {
 	FormControlLabel,
 	Switch,
 	CircularProgress,
-	Alert
+	Alert,
+	LinearProgress
 } from '@mui/material';
 import {
 	Add as AddIcon,
@@ -36,7 +37,8 @@ import {
 	Description as TextIcon,
 	ArrowBack as BackIcon,
 	ArrowForward as ForwardIcon,
-	Save as SaveIcon
+	Save as SaveIcon,
+	CloudUpload as CloudUploadIcon
 } from '@mui/icons-material';
 import { courseService, type Course, type Module, type Lesson } from '../services/courseService';
 import { useNavigate } from 'react-router-dom';
@@ -77,6 +79,10 @@ const AdminCourseCreate: React.FC = () => {
 		order: 0
 	});
 	const [editingLessonIndex, setEditingLessonIndex] = useState<{ moduleIndex: number; lessonIndex: number | null } | null>(null);
+
+	// Video Upload State for Wizard
+	const [selectedVideos, setSelectedVideos] = useState<{ [key: string]: File }>({}); 
+	// key format: "moduleIndex-lessonIdOrTempIndex"
 
 	// Handlers
 	const handleNext = () => {
@@ -187,11 +193,25 @@ const AdminCourseCreate: React.FC = () => {
 					order: mod.order
 				});
 				
-				for (const lesson of mod.lessons) {
-					await courseService.addLesson(savedModule.id, {
+				for (let lIdx = 0; lIdx < mod.lessons.length; lIdx++) {
+					const lesson = mod.lessons[lIdx];
+					const savedLesson = await courseService.addLesson(savedModule.id, {
 						...lesson,
 						module_id: savedModule.id
 					});
+
+					// Check for video upload
+					const mIdx = (course.modules || []).indexOf(mod);
+					const videoKey = `${mIdx}-${lIdx}`;
+					if (selectedVideos[videoKey]) {
+						setError(`Uploading video for: ${lesson.title}...`);
+						await courseService.uploadVideo(
+							newCourse.id,
+							savedModule.id,
+							savedLesson.id,
+							selectedVideos[videoKey]
+						);
+					}
 				}
 			}
 			
@@ -390,6 +410,15 @@ const AdminCourseCreate: React.FC = () => {
 
 				{error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
 
+				{loading && activeStep === steps.length - 1 && (
+					<Box sx={{ mb: 3 }}>
+						<LinearProgress />
+						<Typography variant="caption" sx={{ mt: 1, display: 'block' }}>
+							Processing course creation and uploads...
+						</Typography>
+					</Box>
+				)}
+
 				{renderStepContent(activeStep)}
 
 				<Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
@@ -491,8 +520,29 @@ const AdminCourseCreate: React.FC = () => {
 						<Box sx={{ mt: 2, p: 3, border: '1px dashed #ccc', borderRadius: 1, textAlign: 'center' }}>
 							<VideoIcon sx={{ fontSize: 40, color: 'action.active', mb: 1 }} />
 							<Typography variant="body2" color="text.secondary">
-								Video upload will be supported in a separate step. For now, please enter a title.
+								Video upload will be supported during the final save step. Please select a file.
 							</Typography>
+							<input
+								type="file"
+								accept="video/*"
+								style={{ display: 'none' }}
+								id="video-wizard-upload"
+								onChange={(e) => {
+									if (e.target.files && e.target.files[0] && editingLessonIndex) {
+										const { moduleIndex, lessonIndex } = editingLessonIndex;
+										const key = `${moduleIndex}-${lessonIndex === null ? course.modules![moduleIndex].lessons.length : lessonIndex}`;
+										setSelectedVideos({ ...selectedVideos, [key]: e.target.files[0] });
+									}
+								}}
+							/>
+							<label htmlFor="video-wizard-upload">
+								<Button component="span" variant="outlined" sx={{ mt: 1 }} startIcon={<CloudUploadIcon />}>
+									{editingLessonIndex && selectedVideos[`${editingLessonIndex.moduleIndex}-${editingLessonIndex.lessonIndex === null ? course.modules![editingLessonIndex.moduleIndex].lessons.length : editingLessonIndex.lessonIndex}`] 
+										? selectedVideos[`${editingLessonIndex.moduleIndex}-${editingLessonIndex.lessonIndex === null ? course.modules![editingLessonIndex.moduleIndex].lessons.length : editingLessonIndex.lessonIndex}`].name 
+										: 'Choose Video File'
+									}
+								</Button>
+							</label>
 						</Box>
 					)}
 					

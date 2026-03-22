@@ -7,6 +7,8 @@ import Register from '../pages/Register';
 import ProtectedRoute from './ProtectedRoute';
 import MainLayout from '../components/layout/MainLayout';
 import AdminCourseCreate from '../pages/AdminCourseCreate';
+import AdminCourseEdit from '../pages/AdminCourseEdit';
+import CourseDetail from '../pages/CourseDetail';
 
 const AppRouter: React.FC = () => {
 	return (
@@ -24,8 +26,7 @@ const AppRouter: React.FC = () => {
 				{/* Protected Routes */}
 				<Route element={<ProtectedRoute />}>
 					<Route path="/dashboard" element={<Dashboard />} />
-					{/* Add placeholders for other routes */}
-					<Route path="/courses" element={<Navigate to="/" replace />} />
+					<Route path="/courses/:courseId" element={<CourseDetail />} />
 					<Route path="/candidates" element={<Navigate to="/dashboard" replace />} />
 					<Route path="/training" element={<Navigate to="/dashboard" replace />} />
 					<Route path="/allocations" element={<Navigate to="/dashboard" replace />} />
@@ -34,6 +35,7 @@ const AppRouter: React.FC = () => {
 					
 					{/* Admin Routes */}
 					<Route path="/admin/courses/create" element={<AdminCourseCreate />} />
+					<Route path="/admin/courses/:courseId/edit" element={<AdminCourseEdit />} />
 				</Route>
 			</Route>
 

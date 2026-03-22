@@ -1,7 +1,7 @@
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.repositories.course import course_repository
-from app.schemas.course import CourseCreate, LessonCreate
+from app.schemas.course import CourseCreate, CourseUpdate, LessonCreate, ModuleUpdate, LessonUpdate
 from app.models.course import Course, Module, Lesson
 
 class CourseService:
@@ -44,6 +44,55 @@ class CourseService:
 
     async def create_lesson(self, db: AsyncSession, *, lesson_in: LessonCreate) -> Lesson:
         db_obj = Lesson(**lesson_in.model_dump())
+        db.add(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
+        return db_obj
+
+    async def update_course(self, db: AsyncSession, *, course_id: int, course_in: CourseUpdate) -> Optional[Course]:
+        db_obj = await course_repository.get(db, id=course_id)
+        if not db_obj:
+            return None
+        updated_obj = await course_repository.update(db, db_obj=db_obj, obj_in=course_in)
+        return await self.get_course_structure(db, updated_obj.id)
+
+    async def update_module(self, db: AsyncSession, *, module_id: int, module_in: ModuleUpdate) -> Optional[Module]:
+        from sqlalchemy import select
+        from sqlalchemy.orm import selectinload
+        
+        # We need a module repository ideally, but let's use direct DB for now or add to repo
+        result = await db.execute(select(Module).filter(Module.id == module_id))
+        db_obj = result.scalars().first()
+        if not db_obj:
+            return None
+            
+        update_data = module_in.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_obj, field, value)
+            
+        db.add(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
+        
+        # Refetch with lessons
+        result = await db.execute(
+            select(Module)
+            .options(selectinload(Module.lessons))
+            .filter(Module.id == db_obj.id)
+        )
+        return result.scalars().first()
+
+    async def update_lesson(self, db: AsyncSession, *, lesson_id: int, lesson_in: LessonUpdate) -> Optional[Lesson]:
+        from sqlalchemy import select
+        result = await db.execute(select(Lesson).filter(Lesson.id == lesson_id))
+        db_obj = result.scalars().first()
+        if not db_obj:
+            return None
+            
+        update_data = lesson_in.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(db_obj, field, value)
+            
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)

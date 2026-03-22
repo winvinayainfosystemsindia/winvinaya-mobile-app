@@ -16,6 +16,14 @@ class LessonBase(BaseModel):
 class LessonCreate(LessonBase):
     module_id: int
 
+class LessonUpdate(BaseModel):
+    title: Optional[str] = None
+    content_type: Optional[str] = None
+    media_file_id: Optional[int] = None
+    text_content: Optional[str] = None
+    content_url: Optional[str] = None
+    order: Optional[int] = None
+
 class LessonResponse(LessonBase):
     id: int
     module_id: int
@@ -28,6 +36,10 @@ class ModuleBase(BaseModel):
 
 class ModuleCreate(ModuleBase):
     pass
+
+class ModuleUpdate(BaseModel):
+    title: Optional[str] = None
+    order: Optional[int] = None
 
 class ModuleResponse(ModuleBase):
     id: int

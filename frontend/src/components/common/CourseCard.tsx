@@ -20,6 +20,7 @@ interface CourseCardProps {
     progress?: number; // 0 to 100
     category?: string;
     bestSeller?: boolean;
+    onClick?: () => void;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({
@@ -32,16 +33,19 @@ const CourseCard: React.FC<CourseCardProps> = ({
     originalPrice,
     progress,
     category,
+    onClick,
     bestSeller
 }) => {
     const isEnrolled = progress !== undefined;
 
     return (
         <Card 
+            onClick={onClick}
             sx={{ 
                 height: '100%', 
                 display: 'flex', 
                 flexDirection: 'column',
+                cursor: onClick ? 'pointer' : 'default',
                 transition: 'transform 0.2s',
                 '&:hover': {
                     transform: 'translateY(-4px)',

@@ -11,9 +11,11 @@ import {
 } from '@mui/material';
 import CourseCard from '../components/common/CourseCard';
 import { courseService, type Course } from '../services/courseService';
+import { useNavigate } from 'react-router-dom';
 
 
 const Dashboard: React.FC = () => {
+	const navigate = useNavigate();
 	const [tabValue, setTabValue] = useState(0);
 	const [courses, setCourses] = useState<Course[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -119,6 +121,7 @@ const Dashboard: React.FC = () => {
 											reviewsCount={0}
 											progress={0}
 											category={course.category || 'Uncategorized'}
+											onClick={() => navigate(`/courses/${course.id}`)}
 										/>
 									</Grid>
 								))
