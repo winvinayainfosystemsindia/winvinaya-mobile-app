@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	Grid,
 	Typography,
@@ -10,58 +10,32 @@ import {
 	Paper
 } from '@mui/material';
 import CourseCard from '../components/common/CourseCard';
+import { courseService, type Course } from '../services/courseService';
 
 
 const Dashboard: React.FC = () => {
-	const [tabValue, setTabValue] = React.useState(0);
+	const [tabValue, setTabValue] = useState(0);
+	const [courses, setCourses] = useState<Course[]>([]);
+	const [loading, setLoading] = useState(true);
 
 	const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
 		setTabValue(newValue);
 	};
 
-	// Mock enrolled courses
-	const enrolledCourses = [
-		{
-			id: 1,
-			title: 'Complete Web Design: from Figma to Webflow to Freelancing',
-			instructor: 'Vako Shvili',
-			thumbnail: 'https://img-c.udemycdn.com/course/240x135/2461502_6891_10.jpg',
-			rating: 4.8,
-			reviewsCount: 12450,
-			progress: 35,
-			category: 'Web Development'
-		},
-		{
-			id: 2,
-			title: 'The Full Stack Web Development Bootcamp 2024',
-			instructor: 'Angela Yu',
-			thumbnail: 'https://img-c.udemycdn.com/course/240x135/1565838_e54e_18.jpg',
-			rating: 4.7,
-			reviewsCount: 320120,
-			progress: 15,
-			category: 'Development'
-		},
-		{
-			id: 3,
-			title: 'Advanced React Design Patterns and Performance',
-			instructor: 'Maximilian Schwarzmüller',
-			thumbnail: 'https://img-c.udemycdn.com/course/240x135/1362070_b9a1_2.jpg',
-			rating: 4.6,
-			reviewsCount: 8400,
-			progress: 78,
-			category: 'React'
-		},
-		{
-			id: 4,
-			title: 'User Experience Design Essentials - Adobe XD UI UX Design',
-			instructor: 'Daniel Walter Scott',
-			thumbnail: 'https://img-c.udemycdn.com/course/240x135/1109026_555f_5.jpg',
-			rating: 4.8,
-			reviewsCount: 45600,
-			progress: 100,
-			category: 'Design'
-		}
-	];
+	useEffect(() => {
+		const fetchCourses = async () => {
+			try {
+				const data = await courseService.getCourses();
+				setCourses(data);
+			} catch (error) {
+				console.error('Failed to fetch courses:', error);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchCourses();
+	}, []);
+
 
 	return (
 		<Box sx={{ pb: 8 }}>
@@ -130,19 +104,25 @@ const Dashboard: React.FC = () => {
 						</Paper>
 
 						<Grid container spacing={3}>
-							{enrolledCourses.map((course) => (
-								<Grid size={{ xs: 12, sm: 6, md: 3 }} key={course.id}>
-									<CourseCard
-										title={course.title}
-										instructor={course.instructor}
-										thumbnail={course.thumbnail}
-										rating={course.rating}
-										reviewsCount={course.reviewsCount}
-										progress={course.progress}
-										category={course.category}
-									/>
-								</Grid>
-							))}
+							{loading ? (
+								<Typography sx={{ p: 3 }}>Loading courses...</Typography>
+							) : courses.length === 0 ? (
+								<Typography sx={{ p: 3 }}>No courses available.</Typography>
+							) : (
+								courses.map((course) => (
+									<Grid size={{ xs: 12, sm: 6, md: 3 }} key={course.id}>
+										<CourseCard
+											title={course.title}
+											instructor={course.instructor_id ? `Instructor ${course.instructor_id}` : 'Unknown Instructor'}
+											thumbnail={course.thumbnail_url || 'https://via.placeholder.com/240x135'}
+											rating={4.5} // Mock default 
+											reviewsCount={0}
+											progress={0}
+											category={course.category || 'Uncategorized'}
+										/>
+									</Grid>
+								))
+							)}
 						</Grid>
 					</>
 				) : (

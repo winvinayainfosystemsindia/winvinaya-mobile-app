@@ -137,6 +137,20 @@ const Navbar: React.FC<NavbarProps> = ({
 						<Typography variant="body2" sx={{ cursor: 'pointer', color: '#1c1d1f', '&:hover': { color: 'primary.main' } }}>
 							Teach on WinVinaya
 						</Typography>
+						{(user?.role === 'admin' || user?.role === 'instructor') && (
+							<Typography 
+								variant="body2" 
+								sx={{ 
+									cursor: 'pointer', 
+									color: 'primary.main', 
+									fontWeight: 700, 
+									'&:hover': { color: 'primary.dark' } 
+								}}
+								onClick={() => navigate('/admin/courses/create')}
+							>
+								Create Course
+							</Typography>
+						)}
 					</Box>
 				)}
 
@@ -247,6 +261,11 @@ const Navbar: React.FC<NavbarProps> = ({
 						<MenuItem onClick={() => { navigate('/settings'); handleMenuClose(); }} sx={{ py: 1.5 }}>Account settings</MenuItem>
 						<MenuItem onClick={() => { navigate('/payment-methods'); handleMenuClose(); }} sx={{ py: 1.5 }}>Payment methods</MenuItem>
 						<Divider />
+						{(user?.role === 'admin' || user?.role === 'instructor') && (
+							<MenuItem onClick={() => { navigate('/admin/courses/create'); handleMenuClose(); }} sx={{ py: 1.5, color: 'primary.main', fontWeight: 600 }}>
+								Instructor Dashboard
+							</MenuItem>
+						)}
 						<MenuItem onClick={handleLogoutClick} sx={{ py: 1.5, fontWeight: 700, color: 'primary.main' }}>Log out</MenuItem>
 					</Menu>
 				</Box>

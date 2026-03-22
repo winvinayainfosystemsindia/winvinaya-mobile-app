@@ -8,11 +8,13 @@ from app.models.course import CourseLevel, CourseStatus
 class LessonBase(BaseModel):
     title: str
     content_type: str
+    media_file_id: Optional[int] = None
+    text_content: Optional[str] = None
     content_url: Optional[str] = None
     order: int = 0
 
 class LessonCreate(LessonBase):
-    pass
+    module_id: int
 
 class LessonResponse(LessonBase):
     id: int
@@ -58,7 +60,7 @@ class CourseUpdate(BaseModel):
     price: Optional[int] = None
 
 class CourseCreate(CourseBase):
-    instructor_id: int
+    instructor_id: Optional[int] = None
 
 class CourseResponse(CourseBase):
     id: int

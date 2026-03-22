@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 import Register from '../pages/Register';
 import ProtectedRoute from './ProtectedRoute';
 import MainLayout from '../components/layout/MainLayout';
+import AdminCourseCreate from '../pages/AdminCourseCreate';
 
 const AppRouter: React.FC = () => {
 	return (
@@ -30,6 +31,9 @@ const AppRouter: React.FC = () => {
 					<Route path="/allocations" element={<Navigate to="/dashboard" replace />} />
 					<Route path="/users" element={<Navigate to="/dashboard" replace />} />
 					<Route path="/settings" element={<Navigate to="/dashboard" replace />} />
+					
+					{/* Admin Routes */}
+					<Route path="/admin/courses/create" element={<AdminCourseCreate />} />
 				</Route>
 			</Route>
 
