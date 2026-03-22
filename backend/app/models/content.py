@@ -14,6 +14,8 @@ class QuizQuestionType(str, enum.Enum):
     mcq = "mcq"
     true_false = "true_false"
     short_answer = "short_answer"
+    match_the_following = "match_the_following"
+    comprehensive = "comprehensive"
 
 
 class Quiz(Base):
@@ -48,10 +50,29 @@ class QuizQuestion(Base):
     options = Column(JSONB, nullable=True)  # e.g. [{"key": "a", "text": "Option A"}, ...]
     correct_answer = Column(String(500), nullable=False)  # key or answer text
     explanation = Column(Text, nullable=True)
+    image_id = Column(Integer, ForeignKey("media_files.id"), nullable=True)
     order = Column(Integer, default=0)
     points = Column(Integer, default=1)
 
     quiz = relationship("Quiz", back_populates="questions")
+    image = relationship("MediaFile")
+    matching_pairs = relationship("MatchingPair", back_populates="question", cascade="all, delete-orphan")
+
+
+class MatchingPair(Base):
+    __tablename__ = "matching_pairs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    question_id = Column(Integer, ForeignKey("quiz_questions.id", ondelete="CASCADE"), nullable=False)
+    
+    source_text = Column(String(500), nullable=True)
+    target_text = Column(String(500), nullable=True)
+    source_image_id = Column(Integer, ForeignKey("media_files.id"), nullable=True)
+    target_image_id = Column(Integer, ForeignKey("media_files.id"), nullable=True)
+
+    question = relationship("QuizQuestion", back_populates="matching_pairs")
+    source_image = relationship("MediaFile", foreign_keys=[source_image_id])
+    target_image = relationship("MediaFile", foreign_keys=[target_image_id])
 
 
 class QuizAttempt(Base):

@@ -1,54 +1,18 @@
 import api from './api';
-
-export interface Lesson {
-  id?: number;
-  title: string;
-  description?: string;
-  content_type: string;
-  media_file_id?: number;
-  text_content?: string;
-  content_url?: string;
-  order: number;
-  module_id?: number;
-}
-
-export interface Module {
-  id?: number;
-  title: string;
-  order: number;
-  course_id?: number;
-  lessons: Lesson[];
-}
-
-export interface Course {
-  id?: number;
-  title: string;
-  description?: string;
-  short_description?: string;
-  category?: string;
-  level: string;
-  language: string;
-  tags?: string;
-  is_free: boolean;
-  price: number;
-  instructor_id?: number;
-  status?: string;
-  thumbnail_url?: string;
-  modules: Module[];
-}
+import type { Course, Module, Lesson } from '../models/course';
 
 export const courseService = {
-  createCourse: async (courseData: Partial<Course>) => {
+  createCourse: async (courseData: Partial<Course>): Promise<Course> => {
     const response = await api.post('/courses', courseData);
     return response.data;
   },
 
-  addModule: async (courseId: number, moduleData: { title: string; order: number }) => {
+  addModule: async (courseId: number, moduleData: { title: string; order: number }): Promise<Module> => {
     const response = await api.post(`/courses/${courseId}/modules`, moduleData);
     return response.data;
   },
 
-  addLesson: async (moduleId: number, lessonData: Partial<Lesson>) => {
+  addLesson: async (moduleId: number, lessonData: Partial<Lesson>): Promise<Lesson> => {
     const response = await api.post(`/courses/modules/${moduleId}/lessons`, {
       ...lessonData,
       module_id: moduleId,
@@ -56,27 +20,27 @@ export const courseService = {
     return response.data;
   },
 
-  getCourseStructure: async (courseId: number) => {
+  getCourseStructure: async (courseId: number): Promise<Course> => {
     const response = await api.get(`/courses/${courseId}/structure`);
     return response.data;
   },
 
-  getCourses: async () => {
+  getCourses: async (): Promise<Course[]> => {
     const response = await api.get('/courses');
     return response.data;
   },
 
-  updateCourse: async (courseId: number, courseData: Partial<Course>) => {
+  updateCourse: async (courseId: number, courseData: Partial<Course>): Promise<Course> => {
     const response = await api.patch(`/courses/${courseId}`, courseData);
     return response.data;
   },
 
-  updateModule: async (moduleId: number, moduleData: Partial<Module>) => {
+  updateModule: async (moduleId: number, moduleData: Partial<Module>): Promise<Module> => {
     const response = await api.patch(`/courses/modules/${moduleId}`, moduleData);
     return response.data;
   },
 
-  updateLesson: async (lessonId: number, lessonData: Partial<Lesson>) => {
+  updateLesson: async (lessonId: number, lessonData: Partial<Lesson>): Promise<Lesson> => {
     const response = await api.patch(`/courses/lessons/${lessonId}`, lessonData);
     return response.data;
   },
@@ -108,8 +72,11 @@ export const courseService = {
     return response.data;
   },
 
-  getVideoStreamUrl: async (mediaId: number) => {
+  getVideoStreamUrl: async (mediaId: number): Promise<{ stream_url: string; status: string }> => {
     const response = await api.get(`/media/${mediaId}/share-url`);
     return response.data;
   },
 };
+
+export default courseService;
+export * from '../models/course';

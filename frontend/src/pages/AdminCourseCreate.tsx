@@ -188,14 +188,14 @@ const AdminCourseCreate: React.FC = () => {
 			
 			// 2. Add Modules and Lessons
 			for (const mod of (course.modules || [])) {
-				const savedModule = await courseService.addModule(newCourse.id, {
+				const savedModule = await courseService.addModule(newCourse.id!, {
 					title: mod.title,
 					order: mod.order
 				});
 				
 				for (let lIdx = 0; lIdx < mod.lessons.length; lIdx++) {
 					const lesson = mod.lessons[lIdx];
-					const savedLesson = await courseService.addLesson(savedModule.id, {
+					const savedLesson = await courseService.addLesson(savedModule.id!, {
 						...lesson,
 						module_id: savedModule.id
 					});
@@ -206,9 +206,9 @@ const AdminCourseCreate: React.FC = () => {
 					if (selectedVideos[videoKey]) {
 						setError(`Uploading video for: ${lesson.title}...`);
 						await courseService.uploadVideo(
-							newCourse.id,
-							savedModule.id,
-							savedLesson.id,
+							newCourse.id!,
+							savedModule.id!,
+							savedLesson.id!,
 							selectedVideos[videoKey]
 						);
 					}
@@ -500,7 +500,7 @@ const AdminCourseCreate: React.FC = () => {
 						margin="normal"
 						label="Content Type"
 						value={currentLesson.content_type}
-						onChange={(e) => setCurrentLesson({ ...currentLesson, content_type: e.target.value })}
+						onChange={(e) => setCurrentLesson({ ...currentLesson, content_type: e.target.value as any })}
 					>
 						<MenuItem value="text">Text Content</MenuItem>
 						<MenuItem value="video">Video Upload</MenuItem>

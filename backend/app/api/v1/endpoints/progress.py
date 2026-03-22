@@ -29,10 +29,33 @@ async def update_lesson_progress(
     current_user=Depends(get_current_user),
 ):
     # Verify lesson exists
-    lesson_result = await db.execute(select(Lesson).filter(Lesson.id == lesson_id))
+    lesson_result = await db.execute(
+        select(Lesson).filter(Lesson.id == lesson_id)
+    )
     lesson = lesson_result.scalars().first()
     if not lesson:
         raise NotFoundError("Lesson")
+
+    # Enforce Sequence: Check for previous lesson completion
+    # 1. Find the previous lesson by order (or id if order is 0)
+    prev_lesson_result = await db.execute(
+        select(Lesson)
+        .join(Module, Module.id == Lesson.module_id)
+        .filter(
+            Module.course_id == lesson.module.course_id,
+            Lesson.order < lesson.order
+        )
+        .order_by(Lesson.order.desc())
+        .limit(1)
+    )
+    prev_lesson = prev_lesson_result.scalars().first()
+    
+    if prev_lesson:
+        # 2. Check if user has completed it
+        prev_lp = await progress_repository.get_lesson_progress(db, current_user.id, prev_lesson.id)
+        if not prev_lp or prev_lp.status != LessonProgressStatus.completed:
+            from app.core.exceptions import ValidationError
+            raise ValidationError(f"Previous lesson '{prev_lesson.title}' must be completed first.")
 
     # Upsert lesson progress
     lp = await progress_repository.get_lesson_progress(db, current_user.id, lesson_id)
