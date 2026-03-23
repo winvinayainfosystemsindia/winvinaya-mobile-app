@@ -41,6 +41,41 @@ const contentService = {
     }
     return null as any;
   },
+
+  getVideoUrl: async (mediaId: number): Promise<{ hls_url: string; stream_url: string; status: string; media_id: number; public_id: string }> => {
+    const response = await api.get(`/media/${mediaId}/share-url`);
+    return response.data;
+  },
+
+  getLessonSlides: async (lessonId: number): Promise<any[]> => {
+    const response = await api.get(`/content/lesson/${lessonId}/slides`);
+    return response.data;
+  },
+
+  getCodingExercise: async (lessonId: number): Promise<any> => {
+    const response = await api.get(`/content/lesson/${lessonId}/coding`);
+    return response.data;
+  },
+
+  submitCode: async (exerciseId: number, code: string): Promise<any> => {
+    const response = await api.post(`/content/coding/${exerciseId}/submit`, { code });
+    return response.data;
+  },
+
+  getVideoMarkers: async (lessonId: number): Promise<any[]> => {
+    const response = await api.get(`/content/lesson/${lessonId}/markers`);
+    return response.data;
+  },
+
+  getDiscussions: async (lessonId: number): Promise<any[]> => {
+    const response = await api.get(`/content/lesson/${lessonId}/discussions`);
+    return response.data;
+  },
+
+  postDiscussion: async (lessonId: number, body: string, parentId?: number): Promise<any> => {
+    const response = await api.post(`/content/lesson/${lessonId}/discussions`, { body, parent_id: parentId });
+    return response.data;
+  },
 };
 
 export default contentService;

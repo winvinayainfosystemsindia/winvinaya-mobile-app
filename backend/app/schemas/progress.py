@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 from app.models.progress import LessonProgressStatus
@@ -37,7 +37,8 @@ class CourseProgressResponse(BaseModel):
     percent_complete: float
     lessons_completed: int
     total_lessons: int
-    last_accessed_at: Optional[datetime]
+    last_accessed_at: Optional[datetime] = None
+    lesson_progress: List[LessonProgressResponse] = []
 
     class Config:
         from_attributes = True

@@ -25,6 +25,16 @@ export const courseService = {
     return response.data;
   },
 
+  getRatings: async (courseId: number): Promise<any[]> => {
+    const response = await api.get(`/courses/${courseId}/ratings`);
+    return response.data;
+  },
+
+  postRating: async (courseId: number, rating: number, review?: string): Promise<any> => {
+    const response = await api.post(`/courses/${courseId}/ratings`, { rating, review });
+    return response.data;
+  },
+
   getCourse: async (courseId: number): Promise<Course> => {
     const response = await api.get(`/courses/${courseId}`);
     return response.data;

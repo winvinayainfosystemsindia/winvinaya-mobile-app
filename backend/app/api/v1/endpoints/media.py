@@ -4,7 +4,7 @@ Media endpoint — upload, stream, share (video/documents/images).
 Rate limits are applied to upload and streaming endpoints.
 Video share tokens allow embedding in external LMS players.
 """
-from typing import Optional
+from typing import Optional, List, Any, Dict
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, File, Form, Header, HTTPException, Request, UploadFile, status
@@ -119,9 +119,13 @@ async def create_share_token(
     token = _make_share_token(str(public_id))
     stream_url = f"{settings.BASE_URL}{settings.API_V1_PREFIX}/media/stream/{token}"
     hls_url = None
-    hls_path = media.storage_path.replace("original/", "hls/").rsplit("/", 1)[0] + "/master.m3u8"
-    if storage_service.exists(hls_path):
-        hls_url = f"{settings.BASE_URL}{settings.API_V1_PREFIX}/media/stream/{token}?format=hls"
+    
+    # HLS master manifest path
+    hls_base = media.storage_path.replace("original/", "hls/").rsplit("/", 1)[0]
+    master_path = f"{hls_base}/master.m3u8"
+    
+    if storage_service.exists(master_path):
+        hls_url = f"{settings.BASE_URL}{settings.API_V1_PREFIX}/media/stream/{token}/master.m3u8"
 
     return {
         "share_token": token,
@@ -157,9 +161,10 @@ async def get_video_share_url(
     hls_url = None
     
     # Check HLS master manifest
-    hls_path = media.storage_path.replace("original/", "hls/").rsplit("/", 1)[0] + "/master.m3u8"
-    if storage_service.exists(hls_path):
-        hls_url = f"{settings.BASE_URL}{settings.API_V1_PREFIX}/media/stream/{token}?format=hls"
+    hls_base = media.storage_path.replace("original/", "hls/").rsplit("/", 1)[0]
+    master_path = f"{hls_base}/master.m3u8"
+    if storage_service.exists(master_path):
+        hls_url = f"{settings.BASE_URL}{settings.API_V1_PREFIX}/media/stream/{token}/master.m3u8"
 
     return {
         "media_id": media.id,
@@ -173,49 +178,69 @@ async def get_video_share_url(
 
 
 @router.get(
-    "/stream/{share_token}",
-    summary="Public video stream via signed share token (embeddable in external LMS)",
+    "/stream/{share_token}/{hls_path:path}",
+    summary="Public video stream via signed share token (supports HLS & raw MP4)",
     include_in_schema=True,
 )
 async def stream_by_share_token(
     share_token: str,
-    format: Optional[str] = None,   # "hls" → serve master.m3u8, else raw MP4
+    hls_path: str = "",
     range: Optional[str] = Header(default=None),
     db: AsyncSession = Depends(get_db),
 ):
     """
-    No authentication required — access is controlled by the signed token.
-    Supports both raw MP4 streaming (206 byte-range) and HLS manifest serving.
-    Add CORS headers so external players can load the stream cross-origin.
+    Authorized video streaming. If hls_path is provided, serves HLS files.
+    Otherwise serves the raw MP4 file.
     """
     public_id = _verify_share_token(share_token)
     if not public_id:
         raise HTTPException(status_code=401, detail="Invalid or expired share token.")
 
     media = await media_repository.get_by_public_id(db, public_id)
-    if not media or media.media_type != MediaType.video:
+    if not media:
         raise NotFoundError("Video")
-    if media.status != MediaStatus.ready:
-        raise HTTPException(status_code=400, detail="Video is not ready.")
-
-    # Serve HLS master playlist if requested and available
-    if format == "hls":
-        hls_path = media.storage_path.replace("original/", "hls/").rsplit("/", 1)[0] + "/master.m3u8"
-        if storage_service.exists(hls_path):
-            file_size = storage_service.get_size(hls_path)
-            return StreamingResponse(
-                storage_service.stream(hls_path, 0, file_size - 1),
-                media_type="application/vnd.apple.mpegurl",
-                headers={
-                    "Access-Control-Allow-Origin": "*",
-                    "Cache-Control": "no-cache",
-                },
-            )
+    
+    # Resolve file to serve
+    if hls_path:
+        # HLS files are relative to the hls/ directory
+        base_dir = media.storage_path.replace("original/", "hls/").rsplit("/", 1)[0]
+        target_file = f"{base_dir}/{hls_path}"
+        
+        if not storage_service.exists(target_file):
+            raise NotFoundError(f"HLS component: {hls_path}")
+            
+        file_size = storage_service.get_size(target_file)
+        mime_type = "application/vnd.apple.mpegurl" if hls_path.endswith(".m3u8") else "video/MP2T"
+        
+        return StreamingResponse(
+            storage_service.stream(target_file, 0, file_size - 1),
+            media_type=mime_type,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Cache-Control": "max-age=3600" if hls_path.endswith(".ts") else "no-cache",
+            },
+        )
 
     # Fall back to raw MP4 byte-range streaming
     response = await video_service.stream(db=db, media_id=media.id, range_header=range)
     response.headers["Access-Control-Allow-Origin"] = "*"
     return response
+
+
+# Compatibility redirect for old ?format=hls URLs (optional but helpful)
+@router.get("/stream/{share_token}")
+async def stream_compatibility_redirect(
+    share_token: str,
+    format: Optional[str] = None,
+    range: Optional[str] = Header(default=None),
+    db: AsyncSession = Depends(get_db),
+):
+    if format == "hls":
+        from fastapi.responses import RedirectResponse
+        return RedirectResponse(url=f"{settings.BASE_URL}{settings.API_V1_PREFIX}/media/stream/{share_token}/master.m3u8")
+    
+    # Just call the main logic
+    return await stream_by_share_token(share_token, "", range, db)
 
 
 # ── Document ──────────────────────────────────────────────────────────────────

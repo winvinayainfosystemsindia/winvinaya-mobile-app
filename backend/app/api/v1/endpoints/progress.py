@@ -2,7 +2,7 @@
 Progress endpoint — track lesson completion and course progress.
 """
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -142,7 +142,50 @@ async def get_course_progress(
     db: AsyncSession = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
+    # Fetch lesson progress records first
+    lp_result = await db.execute(
+        select(LessonProgress)
+        .join(Lesson, Lesson.id == LessonProgress.lesson_id)
+        .join(Module, Module.id == Lesson.module_id)
+        .filter(
+            Module.course_id == course_id,
+            LessonProgress.user_id == current_user.id
+        )
+    )
+    lesson_progress = lp_result.scalars().all()
+
     cp = await progress_repository.get_course_progress(db, current_user.id, course_id)
-    if not cp:
-        raise NotFoundError("Progress record (not enrolled or no lessons started)")
-    return cp
+    if cp:
+        # Attach lesson_progress to the object for pydantic
+        cp.lesson_progress = lesson_progress
+        return cp
+
+    # If no progress record, check if enrolled
+    enr_result = await db.execute(
+        select(Enrollment).filter(
+            Enrollment.user_id == current_user.id,
+            Enrollment.course_id == course_id,
+            Enrollment.status != EnrollmentStatus.inactive
+        )
+    )
+    enr = enr_result.scalars().first()
+    if not enr:
+        raise NotFoundError("Course enrollment not found")
+
+    # Fetch total lessons to return a skeleton progress
+    total_result = await db.execute(
+        select(func.count(Lesson.id))
+        .join(Module, Module.id == Lesson.module_id)
+        .filter(Module.course_id == course_id)
+    )
+    total = total_result.scalar() or 0
+
+    return {
+        "user_id": current_user.id,
+        "course_id": course_id,
+        "total_lessons": total,
+        "lessons_completed": 0,
+        "percent_complete": 0.0,
+        "last_accessed_at": None,
+        "lesson_progress": lesson_progress
+    }

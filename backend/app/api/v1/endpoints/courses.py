@@ -1,7 +1,10 @@
 from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.db.session import get_db
+from app.models.rating import CourseRating
 from app.schemas.course import (
     CourseResponse, CourseCreate, CourseUpdate,
     ModuleResponse, ModuleCreate, ModuleUpdate,

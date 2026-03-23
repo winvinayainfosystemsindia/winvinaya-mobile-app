@@ -2,14 +2,31 @@ import React from 'react';
 import { Box, Typography, Paper, CircularProgress } from '@mui/material';
 import { PlayCircleOutline } from '@mui/icons-material';
 import { type Lesson, type Course } from '../../models/course';
+import VideoPlayer from './VideoPlayer';
 import QuizPlayer from '../QuizPlayer';
+import PPTViewer from './PPTViewer';
+import CodeSandbox from './CodeSandbox';
+import DiscussionThread from './DiscussionThread';
+import CourseRating from './CourseRating';
 
 interface CourseContentAreaProps {
   lesson: Lesson;
   course: Course;
-  videoData: { stream_url: string; status: string } | null;
+  videoData: { hls_url?: string; stream_url: string; status: string } | null;
   videoLoading: boolean;
+  slides: any[];
+  slidesLoading: boolean;
+  codingExercise: any;
+  codingLoading: boolean;
+  markers: any[];
+  discussions: any[];
+  ratings: any[];
   onQuizComplete: (attempt: any) => void;
+  onCodeSubmit?: (exerciseId: number, code: string) => Promise<any>;
+  onPostDiscussion?: (body: string, parentId?: number) => Promise<void>;
+  onRateCourse?: (rating: number, review?: string) => Promise<void>;
+  onVideoTimeUpdate?: (time: number) => void;
+  initialVideoTime?: number;
 }
 
 const CourseContentArea: React.FC<CourseContentAreaProps> = ({
@@ -17,7 +34,19 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
   course,
   videoData,
   videoLoading,
+  slides,
+  slidesLoading,
+  codingExercise,
+  codingLoading,
+  markers = [],
+  discussions = [],
+  ratings = [],
   onQuizComplete,
+  onCodeSubmit,
+  onPostDiscussion,
+  onRateCourse,
+  onVideoTimeUpdate,
+  initialVideoTime = 0,
 }) => {
   return (
     <Box>
@@ -33,16 +62,13 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
                 <CircularProgress color="primary" />
               </Box>
             ) : videoData?.stream_url ? (
-              <video
-                key={videoData.stream_url}
-                controls
-                controlsList="nodownload"
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+              <VideoPlayer
+                src={videoData.hls_url || videoData.stream_url}
                 poster={course.thumbnail_url || undefined}
-              >
-                <source src={videoData.stream_url} type="video/mp4" />
-                Your browser does not support the video tag.
-              </video>
+                initialTime={initialVideoTime}
+                onTimeUpdate={onVideoTimeUpdate}
+                markers={markers}
+              />
             ) : (
               <Box
                 sx={{
@@ -68,20 +94,31 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
             />
           </Box>
         ) : lesson.content_type === 'ppt' ? (
-          <Box sx={{ p: 0, bgcolor: '#f7f9fa' }}>
-             {/* Placeholder for PPT Viewer - will show converted slide images */}
-             <Box sx={{ p: 4, textAlign: 'center' }}>
-                <Typography variant="h6">PPT Presentation</Typography>
-                <Typography color="text.secondary">Slide images will be displayed here.</Typography>
-             </Box>
+          <Box sx={{ p: 0, bgcolor: '#f7f9fa', minHeight: 400 }}>
+             {slidesLoading ? (
+               <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
+                 <CircularProgress />
+               </Box>
+             ) : (
+               <PPTViewer slides={slides} />
+             )}
           </Box>
         ) : lesson.content_type === 'code' ? (
-          <Box sx={{ p: 0, bgcolor: '#1e1e1e', height: 500 }}>
-             {/* Placeholder for Code Editor / Sandbox */}
-             <Box sx={{ p: 4, color: '#fff' }}>
-                <Typography variant="h6">Coding Exercise</Typography>
-                <Typography sx={{ opacity: 0.7 }}>Interactive code editor will be available here.</Typography>
-             </Box>
+          <Box sx={{ p: 0, bgcolor: '#1e1e1e', height: 600 }}>
+             {codingLoading ? (
+               <Box sx={{ p: 4, display: 'flex', justifyContent: 'center', color: '#fff' }}>
+                 <CircularProgress color="inherit" />
+               </Box>
+             ) : codingExercise ? (
+               <CodeSandbox 
+                 exercise={codingExercise} 
+                 onSubmit={(code) => onCodeSubmit ? onCodeSubmit(codingExercise.id, code) : Promise.reject('No submit handler')}
+               />
+             ) : (
+               <Box sx={{ p: 4, color: '#fff' }}>
+                 <Typography>No coding exercise details found.</Typography>
+               </Box>
+             )}
           </Box>
         ) : (
           <Box sx={{ p: 4, bgcolor: '#fff', minHeight: 400 }}>
@@ -98,6 +135,20 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
           {lesson.description || 'No description provided.'}
         </Typography>
       </Box>
+
+      {onPostDiscussion && (
+        <DiscussionThread 
+          discussions={discussions} 
+          onPost={onPostDiscussion} 
+        />
+      )}
+
+      {onRateCourse && (
+        <CourseRating 
+          ratings={ratings} 
+          onRate={onRateCourse} 
+        />
+      )}
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -13,10 +13,11 @@ import {
 import { Menu as MenuIcon, ChevronRight } from '@mui/icons-material';
 import CourseSidebar from '../components/course/CourseSidebar';
 import CourseContentArea from '../components/course/CourseContentArea';
-import type { Course, Lesson } from '../models/course';
-import type { CourseProgress } from '../models/progress';
-import courseService from '../services/courseService'; // Assuming these exist or will be enhanced
+import { type Course, type Lesson } from '../models/course';
+import { type CourseProgress } from '../models/progress';
+import courseService from '../services/courseService';
 import progressService from '../services/progressService';
+import contentService from '../services/contentService';
 
 const CoursePlayer: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -29,6 +30,15 @@ const CoursePlayer: React.FC = () => {
   const [expandedModule, setExpandedModule] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [videoData, setVideoData] = useState<{ hls_url?: string; stream_url: string; status: string } | null>(null);
+  const [videoLoading, setVideoLoading] = useState(false);
+  const [slides, setSlides] = useState<any[]>([]);
+  const [slidesLoading, setSlidesLoading] = useState(false);
+  const [codingExercise, setCodingExercise] = useState<any>(null);
+  const [codingLoading, setCodingLoading] = useState(false);
+  const [markers, setMarkers] = useState<any[]>([]);
+  const [discussions, setDiscussions] = useState<any[]>([]);
+  const [ratings, setRatings] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,8 +55,19 @@ const CoursePlayer: React.FC = () => {
         // Auto-select first lesson or last accessed
         const firstModule = courseData.modules[0];
         if (firstModule && firstModule.lessons.length > 0) {
-          setSelectedLesson(firstModule.lessons[0]);
+          const lesson = firstModule.lessons[0];
+          setSelectedLesson(lesson);
           setExpandedModule(firstModule.id!);
+
+          if (lesson.content_type === 'video' && lesson.media_file_id) {
+            fetchVideoData(lesson.media_file_id);
+            fetchMarkers(lesson.id!);
+          } else if (lesson.content_type === 'ppt') {
+            fetchSlides(lesson.id!);
+          } else if (lesson.content_type === 'code') {
+            fetchCodingExercise(lesson.id!);
+          }
+          fetchDiscussions(lesson.id!);
         }
       } catch (err) {
         console.error('Failed to load course player data', err);
@@ -57,17 +78,130 @@ const CoursePlayer: React.FC = () => {
     fetchData();
   }, [courseId]);
 
+  const fetchVideoData = async (mediaId: number) => {
+    try {
+      setVideoLoading(true);
+      const data = await contentService.getVideoUrl(mediaId);
+      setVideoData(data);
+    } catch (err) {
+      console.error('Failed to fetch video URL', err);
+      setVideoData(null);
+    } finally {
+      setVideoLoading(false);
+    }
+  };
+
+  const fetchMarkers = async (lessonId: number) => {
+    try {
+      const data = await contentService.getVideoMarkers(lessonId);
+      setMarkers(data);
+    } catch (err) {
+      console.error('Failed to fetch markers', err);
+      setMarkers([]);
+    }
+  };
+
+  const fetchSlides = async (lessonId: number) => {
+    try {
+      setSlidesLoading(true);
+      const data = await contentService.getLessonSlides(lessonId);
+      setSlides(data);
+    } catch (err) {
+      console.error('Failed to fetch slides', err);
+      setSlides([]);
+    } finally {
+      setSlidesLoading(false);
+    }
+  };
+
+  const fetchCodingExercise = async (lessonId: number) => {
+    try {
+      setCodingLoading(true);
+      const data = await contentService.getCodingExercise(lessonId);
+      setCodingExercise(data);
+    } catch (err) {
+      console.error('Failed to fetch coding exercise', err);
+      setCodingExercise(null);
+    } finally {
+      setCodingLoading(false);
+    }
+  };
+
+  const handleCodeSubmit = async (exerciseId: number, code: string) => {
+    return await contentService.submitCode(exerciseId, code);
+  };
+
   const handleLessonClick = (lesson: Lesson, moduleId: number) => {
     setSelectedLesson(lesson);
     setExpandedModule(moduleId);
+    setVideoData(null);
+    setSlides([]);
+    setCodingExercise(null);
+
+    if (lesson.content_type === 'video' && lesson.media_file_id) {
+      fetchVideoData(lesson.media_file_id);
+      fetchMarkers(lesson.id!);
+    } else if (lesson.content_type === 'ppt') {
+      fetchSlides(lesson.id!);
+    } else if (lesson.content_type === 'code') {
+      fetchCodingExercise(lesson.id!);
+    }
+
+
+    fetchDiscussions(lesson.id!);
+
     if (isMobile) setSidebarOpen(false);
+  };
+
+  const fetchDiscussions = async (lessonId: number) => {
+    try {
+      const data = await contentService.getDiscussions(lessonId);
+      setDiscussions(data);
+    } catch (err) {
+      console.error('Failed to fetch discussions', err);
+      setDiscussions([]);
+    }
+  };
+
+  const handlePostDiscussion = async (body: string, parentId?: number) => {
+    if (!selectedLesson) return;
+    try {
+      await contentService.postDiscussion(selectedLesson.id!, body, parentId);
+      fetchDiscussions(selectedLesson.id!); // Refresh
+    } catch (err) {
+      console.error('Failed to post discussion', err);
+    }
+  };
+
+  const fetchRatings = async (cid: number) => {
+    try {
+      const data = await courseService.getRatings(cid);
+      setRatings(data);
+    } catch (err) {
+      console.error('Failed to fetch ratings', err);
+      setRatings([]);
+    }
+  };
+
+  const handleRateCourse = async (rating: number, review?: string) => {
+    if (!course) return;
+    try {
+      await courseService.postRating(course.id!, rating, review);
+      fetchRatings(course.id!); // Refresh
+    } catch (err) {
+      console.error('Failed to post rating', err);
+    }
   };
 
   const handleQuizComplete = async () => {
     // Refresh progress after quiz
     if (courseId) {
-      const updatedProgress = await progressService.getCourseProgress(Number(courseId));
-      setProgress(updatedProgress);
+      try {
+        const updatedProgress = await progressService.getCourseProgress(Number(courseId));
+        setProgress(updatedProgress);
+      } catch (err) {
+        console.error('Failed to update progress', err);
+      }
     }
   };
 
@@ -103,9 +237,26 @@ const CoursePlayer: React.FC = () => {
             <CourseContentArea
               lesson={selectedLesson}
               course={course}
-              videoData={null} // To be fetched dynamically based on lesson
-              videoLoading={false}
+              videoData={videoData}
+              videoLoading={videoLoading}
+              slides={slides}
+              slidesLoading={slidesLoading}
+              codingExercise={codingExercise}
+              codingLoading={codingLoading}
+              markers={markers}
+              discussions={discussions}
+              ratings={ratings}
               onQuizComplete={handleQuizComplete}
+              onCodeSubmit={handleCodeSubmit}
+              onPostDiscussion={handlePostDiscussion}
+              onRateCourse={handleRateCourse}
+              initialVideoTime={progress?.lesson_progress?.find(p => p.lesson_id === selectedLesson.id)?.video_position_seconds || 0}
+              onVideoTimeUpdate={(time) => {
+                // Throttle progress updates ideally
+                if (Math.floor(time) % 5 === 0) {
+                  progressService.updateVideoPosition(selectedLesson.id!, Math.floor(time));
+                }
+              }}
             />
           </Container>
         </Box>
