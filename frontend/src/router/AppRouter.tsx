@@ -4,6 +4,7 @@ import { Box, useTheme, useMediaQuery } from '@mui/material';
 
 // Components
 import Navbar from '../components/layout/Navbar';
+import Footer from '../components/layout/Footer';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { logout } from '../store/slices/authSlice';
 
@@ -49,6 +50,7 @@ const Layout: React.FC = () => {
       <Box component="main" sx={{ flexGrow: 1, pt: '72px' }}>
         <Outlet />
       </Box>
+      <Footer />
     </Box>
   );
 };
@@ -61,15 +63,15 @@ const AppRouter: React.FC = () => {
         <Route path="/auth/register" element={<Register />} />
       </Route>
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-      </Route> 
 
       <Route path="/maintenance" element={<Maintenance />} />
       
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/catalog" element={<CourseCatalog />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
         <Route path="/page-not-found" element={<NotFound />} />
       </Route>
 
