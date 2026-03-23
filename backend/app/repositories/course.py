@@ -35,6 +35,14 @@ class CourseRepository(BaseRepository[Course, CourseCreate, CourseUpdate]):
         )
         return result.unique().scalars().first()
 
+    async def get_with_modules_by_public_id(self, db: AsyncSession, public_id: Any) -> Optional[Course]:
+        result = await db.execute(
+            select(Course)
+            .options(joinedload(Course.modules).selectinload(Module.lessons))
+            .filter(Course.public_id == public_id)
+        )
+        return result.unique().scalars().first()
+
     async def get_by_slug(self, db: AsyncSession, slug: str) -> Optional[Course]:
         result = await db.execute(select(Course).filter(Course.slug == slug))
         return result.scalars().first()

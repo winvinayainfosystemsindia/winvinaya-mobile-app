@@ -26,6 +26,7 @@ class LessonUpdate(BaseModel):
 
 class LessonResponse(LessonBase):
     id: int
+    public_id: UUID
     module_id: int
     class Config:
         from_attributes = True

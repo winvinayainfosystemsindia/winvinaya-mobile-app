@@ -40,6 +40,11 @@ export const courseService = {
     return response.data;
   },
 
+  getCourseByPublicId: async (publicId: string): Promise<Course> => {
+    const response = await api.get(`/courses/public/${publicId}`);
+    return response.data;
+  },
+
   getCourses: async (): Promise<Course[]> => {
     const response = await api.get('/courses');
     return response.data;

@@ -27,7 +27,7 @@ import {
   UserPlus, 
   BookOpen
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 
 interface Group {
   id: number;
@@ -47,7 +47,7 @@ const AdminGroups: React.FC = () => {
   const fetchGroups = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/v1/groups/');
+      const response = await api.get('/groups/');
       setGroups(response.data);
     } catch (err) {
       console.error('Failed to fetch groups', err);
@@ -64,7 +64,7 @@ const AdminGroups: React.FC = () => {
   const handleCreateGroup = async () => {
     if (!newName) return;
     try {
-      await axios.post('/api/v1/groups/', null, {
+      await api.post('/groups/', null, {
         params: { name: newName, description: newDesc }
       });
       setOpenCreate(false);

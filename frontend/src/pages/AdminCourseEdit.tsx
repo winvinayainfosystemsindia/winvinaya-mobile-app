@@ -36,7 +36,7 @@ import {
 } from '@mui/icons-material';
 import { courseService, type Course, type Module, type Lesson } from '../services/courseService';
 import contentService, { type Quiz } from '../services/contentService';
-import QuizEditor from '../components/admin/QuizEditor';
+import QuizEditor from '../components/quiz/QuizEditor';
 
 const AdminCourseEdit: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();

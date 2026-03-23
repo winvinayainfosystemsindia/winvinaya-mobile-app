@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -13,6 +13,7 @@ import {
 import { Menu as MenuIcon, ChevronRight } from '@mui/icons-material';
 import CourseSidebar from '../components/course/CourseSidebar';
 import CourseContentArea from '../components/course/CourseContentArea';
+import CoursePlayerHeader from '../components/course/CoursePlayerHeader';
 import { type Course, type Lesson } from '../models/course';
 import { type CourseProgress } from '../models/progress';
 import courseService from '../services/courseService';
@@ -20,7 +21,8 @@ import progressService from '../services/progressService';
 import contentService from '../services/contentService';
 
 const CoursePlayer: React.FC = () => {
-  const { courseId } = useParams<{ courseId: string }>();
+  const { coursePublicId, lessonPublicId } = useParams<{ coursePublicId: string; lessonPublicId?: string }>();
+  const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
 
@@ -42,32 +44,51 @@ const CoursePlayer: React.FC = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!courseId) return;
+      if (!coursePublicId) return;
       try {
         setLoading(true);
-        const [courseData, progressData] = await Promise.all([
-          courseService.getCourse(Number(courseId)),
-          progressService.getCourseProgress(Number(courseId))
-        ]);
+        const courseData = await courseService.getCourseByPublicId(coursePublicId);
+        const progressData = await progressService.getCourseProgress(courseData.id!);
+        
         setCourse(courseData);
         setProgress(progressData);
 
-        // Auto-select first lesson or last accessed
-        const firstModule = courseData.modules[0];
-        if (firstModule && firstModule.lessons.length > 0) {
-          const lesson = firstModule.lessons[0];
-          setSelectedLesson(lesson);
-          setExpandedModule(firstModule.id!);
+        // Find initial lesson: either by lessonPublicId from URL, or first lesson
+        let initialLesson: Lesson | null = null;
+        let initialModuleId: number | null = null;
 
-          if (lesson.content_type === 'video' && lesson.media_file_id) {
-            fetchVideoData(lesson.media_file_id);
-            fetchMarkers(lesson.id!);
-          } else if (lesson.content_type === 'ppt') {
-            fetchSlides(lesson.id!);
-          } else if (lesson.content_type === 'code') {
-            fetchCodingExercise(lesson.id!);
+        if (lessonPublicId) {
+          for (const mod of courseData.modules) {
+            const found = mod.lessons.find(l => l.public_id === lessonPublicId);
+            if (found) {
+              initialLesson = found;
+              initialModuleId = mod.id!;
+              break;
+            }
           }
-          fetchDiscussions(lesson.id!);
+        }
+
+        if (!initialLesson && courseData.modules.length > 0) {
+          const firstMod = courseData.modules[0];
+          if (firstMod.lessons.length > 0) {
+            initialLesson = firstMod.lessons[0];
+            initialModuleId = firstMod.id!;
+          }
+        }
+
+        if (initialLesson) {
+          setSelectedLesson(initialLesson);
+          setExpandedModule(initialModuleId);
+
+          if (initialLesson.content_type === 'video' && initialLesson.media_file_id) {
+            fetchVideoData(initialLesson.media_file_id);
+            fetchMarkers(initialLesson.id!);
+          } else if (initialLesson.content_type === 'ppt') {
+            fetchSlides(initialLesson.id!);
+          } else if (initialLesson.content_type === 'code') {
+            fetchCodingExercise(initialLesson.id!);
+          }
+          fetchDiscussions(initialLesson.id!);
         }
       } catch (err) {
         console.error('Failed to load course player data', err);
@@ -76,7 +97,7 @@ const CoursePlayer: React.FC = () => {
       }
     };
     fetchData();
-  }, [courseId]);
+  }, [coursePublicId, lessonPublicId]);
 
   const fetchVideoData = async (mediaId: number) => {
     try {
@@ -132,6 +153,10 @@ const CoursePlayer: React.FC = () => {
   };
 
   const handleLessonClick = (lesson: Lesson, moduleId: number) => {
+    // Navigate to the new lesson URL, which will trigger the useEffect
+    navigate(`/student/learn/${coursePublicId}/${lesson.public_id}`);
+    
+    // Optional: immediate state update for responsiveness
     setSelectedLesson(lesson);
     setExpandedModule(moduleId);
     setVideoData(null);
@@ -195,9 +220,9 @@ const CoursePlayer: React.FC = () => {
 
   const handleQuizComplete = async () => {
     // Refresh progress after quiz
-    if (courseId) {
+    if (course?.id) {
       try {
-        const updatedProgress = await progressService.getCourseProgress(Number(courseId));
+        const updatedProgress = await progressService.getCourseProgress(course.id);
         setProgress(updatedProgress);
       } catch (err) {
         console.error('Failed to update progress', err);
@@ -229,7 +254,9 @@ const CoursePlayer: React.FC = () => {
   );
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', bgcolor: '#f7f9fa' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', bgcolor: '#f7f9fa', overflow: 'hidden' }}>
+      <CoursePlayerHeader course={course} progress={progress} />
+      
       <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
         {/* Main Content */}
         <Box sx={{ flexGrow: 1, overflowY: 'auto', p: { xs: 2, md: 4 } }}>

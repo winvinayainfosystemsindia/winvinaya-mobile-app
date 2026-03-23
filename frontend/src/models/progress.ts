@@ -20,5 +20,6 @@ export interface CourseProgress {
   course_id: number;
   user_id: number;
   status: ProgressStatus;
+  progress_percent: number;
   lesson_progress: LessonProgress[];
 }

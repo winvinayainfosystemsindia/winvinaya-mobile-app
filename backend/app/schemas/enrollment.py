@@ -16,6 +16,9 @@ class EnrollmentUpdate(BaseModel):
     completed_at: Optional[datetime] = None
 
 
+from app.schemas.course import CourseResponse
+
+
 class EnrollmentResponse(BaseModel):
     id: int
     user_id: int
@@ -24,6 +27,7 @@ class EnrollmentResponse(BaseModel):
     progress_percent: float
     enrolled_at: datetime
     completed_at: Optional[datetime]
+    course: Optional[CourseResponse] = None
 
     class Config:
         from_attributes = True

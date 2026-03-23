@@ -101,4 +101,7 @@ class CourseService:
     async def get_course_structure(self, db: AsyncSession, course_id: int) -> Optional[Course]:
         return await course_repository.get_with_modules(db, course_id=course_id)
 
+    async def get_course_structure_by_public_id(self, db: AsyncSession, public_id: str) -> Optional[Course]:
+        return await course_repository.get_with_modules_by_public_id(db, public_id=public_id)
+
 course_service = CourseService()

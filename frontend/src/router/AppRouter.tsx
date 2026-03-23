@@ -1,54 +1,84 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from '../pages/Login';
-import Dashboard from '../pages/Dashboard';
-import Home from '../pages/Home';
-import Register from '../pages/Register';
+
+// Layouts
+import AdminLayout from '../layouts/AdminLayout';
+import StudentLayout from '../layouts/StudentLayout';
+import TeacherLayout from '../layouts/TeacherLayout';
+import PublicLayout from '../layouts/PublicLayout';
+
+// Auth & Guards
 import ProtectedRoute from './ProtectedRoute';
-import MainLayout from '../components/layout/MainLayout';
-import AdminCourseCreate from '../pages/AdminCourseCreate';
-import AdminCourseEdit from '../pages/AdminCourseEdit';
+import RoleRoute from './RoleRoute';
+
+// Pages
+import Home from '../pages/Home';
+import Login from '../pages/Login';
+import Register from '../pages/Register';
 import CourseDetail from '../pages/CourseDetail';
 import CoursePlayer from '../pages/CoursePlayer';
 import AdminGroups from '../pages/admin/AdminGroups';
 import AdminEnrollments from '../pages/admin/AdminEnrollments';
+import AdminCourseCreate from '../pages/AdminCourseCreate';
+import AdminCourseEdit from '../pages/AdminCourseEdit';
+
+// Dashboards
+import StudentDashboard from '../pages/student/DashboardPage';
+import TeacherDashboard from '../pages/teacher/DashboardPage';
+import TeacherCoursesPage from '../pages/teacher/CoursesPage';
+import CourseBuilderPage from '../pages/teacher/CourseBuilderPage';
+import AdminDashboard from '../pages/admin/DashboardPage';
 
 const AppRouter: React.FC = () => {
-	return (
-		<Routes>
-			{/* Layout wraps everything to provide global header */}
-			{/* Auth Routes (No Navbar) */}
-			<Route path="/login" element={<Login />} />
-			<Route path="/register" element={<Register />} />
+  return (
+    <Routes>
+      {/* Public Routes - No Layout required for login/register usually or using PublicLayout later */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      
+      <Route element={<PublicLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/courses/:coursePublicId" element={<CourseDetail />} />
+      </Route>
 
-			{/* Layout wraps everything else to provide global header */}
-			<Route element={<MainLayout />}>
-				{/* Public Routes */}
-				<Route path="/" element={<Home />} />
+      {/* Authenticated Routes */}
+      <Route element={<ProtectedRoute />}>
+        
+        {/* Student Portal */}
+        <Route path="/student" element={<StudentLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<StudentDashboard />} />
+          <Route path="learn/:coursePublicId" element={<CoursePlayer />} />
+          <Route path="learn/:coursePublicId/:lessonPublicId" element={<CoursePlayer />} />
+        </Route>
 
-				{/* Protected Routes */}
-				<Route element={<ProtectedRoute />}>
-					<Route path="/dashboard" element={<Dashboard />} />
-					<Route path="/courses/:courseId" element={<CourseDetail />} />
-					<Route path="/courses/:courseId/learn" element={<CoursePlayer />} />
-					<Route path="/candidates" element={<Navigate to="/dashboard" replace />} />
-					<Route path="/training" element={<Navigate to="/dashboard" replace />} />
-					<Route path="/allocations" element={<Navigate to="/dashboard" replace />} />
-					<Route path="/users" element={<Navigate to="/dashboard" replace />} />
-					<Route path="/settings" element={<Navigate to="/dashboard" replace />} />
-					
-					{/* Admin Routes */}
-					<Route path="/admin/courses/create" element={<AdminCourseCreate />} />
-					<Route path="/admin/courses/:courseId/edit" element={<AdminCourseEdit />} />
-					<Route path="/admin/groups" element={<AdminGroups />} />
-					<Route path="/admin/enrollments" element={<AdminEnrollments />} />
-				</Route>
-			</Route>
+        <Route element={<RoleRoute allowedRoles={['instructor', 'admin']} />}>
+          <Route path="/teacher" element={<TeacherLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<TeacherDashboard />} />
+            <Route path="courses" element={<TeacherCoursesPage />} />
+            <Route path="courses/:coursePublicId/build" element={<CourseBuilderPage />} />
+          </Route>
+        </Route>
 
-			{/* Catch-all */}
-			<Route path="*" element={<Navigate to="/" replace />} />
-		</Routes>
-	);
+        {/* Admin Portal (Admin Only) */}
+        <Route element={<RoleRoute allowedRoles={['admin']} />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="groups" element={<AdminGroups />} />
+            <Route path="enrollments" element={<AdminEnrollments />} />
+            <Route path="courses/create" element={<AdminCourseCreate />} />
+            <Route path="courses/:courseId/edit" element={<AdminCourseEdit />} />
+          </Route>
+        </Route>
+
+      </Route>
+
+      {/* Catch-all redirects to home */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
 };
 
 export default AppRouter;

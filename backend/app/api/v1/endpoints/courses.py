@@ -141,3 +141,16 @@ async def update_module_lesson(
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
     return lesson
+@router.get("/public/{public_id}", response_model=CourseResponse)
+async def read_course_structure_by_public_id(
+    *,
+    db: AsyncSession = Depends(get_db),
+    public_id: str,
+) -> Any:
+    """
+    Get course structure (modules/lessons) by public UUID.
+    """
+    course = await course_service.get_course_structure_by_public_id(db, public_id=public_id)
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return course

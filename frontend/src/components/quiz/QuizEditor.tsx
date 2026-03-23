@@ -13,6 +13,10 @@ import {
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import { type Quiz, type QuizQuestion, QuizQuestionType } from '../../models/content';
+import MCQEditor from './editors/MCQEditor';
+import MatchEditor from './editors/MatchEditor';
+import TrueFalseEditor from './editors/TrueFalseEditor';
+import ShortAnswerEditor from './editors/ShortAnswerEditor';
 
 interface QuizEditorProps {
   quiz: Quiz | null;
@@ -31,9 +35,17 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, loading, onChange }) => {
       correct_answer: '',
       order: quiz.questions.length,
       points: 1,
-      matching_pairs: []
+      matching_pairs: [],
+      options: []
     };
     onChange({ ...quiz, questions: [...quiz.questions, newQuestion] });
+  };
+
+  const updateQuestion = (index: number, updatedQ: QuizQuestion) => {
+    if (!quiz) return;
+    const qs = [...quiz.questions];
+    qs[index] = updatedQ;
+    onChange({ ...quiz, questions: qs });
   };
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}><CircularProgress size={24} /></Box>;
@@ -85,9 +97,7 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, loading, onChange }) => {
                       fullWidth label="Question Text" size="small"
                       value={q.question_text}
                       onChange={e => {
-                        const qs = [...quiz.questions];
-                        qs[qIdx] = {...qs[qIdx], question_text: e.target.value};
-                        onChange({...quiz, questions: qs});
+                        updateQuestion(qIdx, { ...q, question_text: e.target.value });
                       }}
                     />
                   </Grid>
@@ -96,61 +106,50 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, loading, onChange }) => {
                       select fullWidth label="Type" size="small"
                       value={q.question_type}
                       onChange={e => {
-                        const qs = [...quiz.questions];
-                        qs[qIdx] = {...qs[qIdx], question_type: e.target.value as any};
-                        onChange({...quiz, questions: qs});
+                        updateQuestion(qIdx, { ...q, question_type: e.target.value as any });
                       }}
                     >
                       <MenuItem value={QuizQuestionType.mcq}>MCQ</MenuItem>
                       <MenuItem value={QuizQuestionType.true_false}>True / False</MenuItem>
                       <MenuItem value={QuizQuestionType.match_the_following}>Match the Following</MenuItem>
+                      <MenuItem value={QuizQuestionType.short_answer}>Short Answer</MenuItem>
                     </TextField>
                   </Grid>
                   
+                  {/* MCQ Choices Editor */}
+                  {q.question_type === QuizQuestionType.mcq && (
+                    <Grid size={{ xs: 12 }}>
+                      <MCQEditor 
+                        question={q} 
+                        onChange={(updatedQ) => updateQuestion(qIdx, updatedQ)} 
+                      />
+                    </Grid>
+                  )}
+
                   {q.question_type === QuizQuestionType.match_the_following && (
                     <Grid size={{ xs: 12 }}>
-                      <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1, fontWeight: 600 }}>Matching Pairs</Typography>
-                      {q.matching_pairs?.map((p, pIdx) => (
-                        <Box key={pIdx} sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                          <TextField 
-                            fullWidth placeholder="Source" size="small" 
-                            value={p.source_text}
-                            onChange={e => {
-                              const pairs = [...q.matching_pairs];
-                              pairs[pIdx] = {...pairs[pIdx], source_text: e.target.value};
-                              const qs = [...quiz.questions];
-                              qs[qIdx] = {...qs[qIdx], matching_pairs: pairs};
-                              onChange({...quiz, questions: qs});
-                            }}
-                          />
-                          <TextField 
-                            fullWidth placeholder="Target" size="small" 
-                            value={p.target_text}
-                            onChange={e => {
-                              const pairs = [...q.matching_pairs];
-                              pairs[pIdx] = {...pairs[pIdx], target_text: e.target.value};
-                              const qs = [...quiz.questions];
-                              qs[qIdx] = {...qs[qIdx], matching_pairs: pairs};
-                              onChange({...quiz, questions: qs});
-                            }}
-                          />
-                          <IconButton size="small" onClick={() => {
-                            const pairs = [...q.matching_pairs];
-                            pairs.splice(pIdx, 1);
-                            const qs = [...quiz.questions];
-                            qs[qIdx] = {...qs[qIdx], matching_pairs: pairs};
-                            onChange({...quiz, questions: qs});
-                          }}>
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      ))}
-                      <Button size="small" startIcon={<Add />} onClick={() => {
-                        const pairs = [...(q.matching_pairs || []), { id: Date.now(), source_text: '', target_text: '' }];
-                        const qs = [...quiz.questions];
-                        qs[qIdx] = {...qs[qIdx], matching_pairs: pairs};
-                        onChange({...quiz, questions: qs});
-                      }}>Add Pair</Button>
+                      <MatchEditor 
+                        question={q} 
+                        onChange={(updatedQ) => updateQuestion(qIdx, updatedQ)} 
+                      />
+                    </Grid>
+                  )}
+
+                  {q.question_type === QuizQuestionType.true_false && (
+                    <Grid size={{ xs: 12 }}>
+                      <TrueFalseEditor 
+                        question={q} 
+                        onChange={(updatedQ) => updateQuestion(qIdx, updatedQ)} 
+                      />
+                    </Grid>
+                  )}
+
+                  {q.question_type === QuizQuestionType.short_answer && (
+                    <Grid size={{ xs: 12 }}>
+                      <ShortAnswerEditor 
+                        question={q} 
+                        onChange={(updatedQ) => updateQuestion(qIdx, updatedQ)} 
+                      />
                     </Grid>
                   )}
 
@@ -159,9 +158,7 @@ const QuizEditor: React.FC<QuizEditorProps> = ({ quiz, loading, onChange }) => {
                       fullWidth multiline rows={2} label="Explanation / Feedback" size="small"
                       value={q.explanation || ''}
                       onChange={e => {
-                        const qs = [...quiz.questions];
-                        qs[qIdx] = {...qs[qIdx], explanation: e.target.value};
-                        onChange({...quiz, questions: qs});
+                        updateQuestion(qIdx, { ...q, explanation: e.target.value });
                       }}
                     />
                   </Grid>

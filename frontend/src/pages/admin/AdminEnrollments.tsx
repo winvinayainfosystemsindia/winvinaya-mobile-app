@@ -22,7 +22,7 @@ import {
   DialogActions
 } from '@mui/material';
 import { Calendar, ShieldAlert, History } from 'lucide-react';
-import axios from 'axios';
+import api from '../../services/api';
 import { format } from 'date-fns';
 
 interface Enrollment {
@@ -51,7 +51,7 @@ const AdminEnrollments: React.FC = () => {
   const fetchEnrollments = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('/api/v1/enrollments/admin/all');
+      const response = await api.get('/enrollments/admin/all');
       setEnrollments(response.data);
     } catch (err) {
       console.error('Failed to fetch enrollments', err);
@@ -67,7 +67,7 @@ const AdminEnrollments: React.FC = () => {
   const handleUpdateExpiry = async () => {
     if (!selectedEnrollment || !newExpiry) return;
     try {
-      await axios.patch(`/api/v1/enrollments/admin/${selectedEnrollment.id}/expiry`, null, {
+      await api.patch(`/enrollments/admin/${selectedEnrollment.id}/expiry`, null, {
         params: { expiry_date: new Date(newExpiry).toISOString() }
       });
       setSelectedEnrollment(null);

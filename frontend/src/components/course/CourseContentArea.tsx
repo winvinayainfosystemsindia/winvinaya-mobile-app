@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, CircularProgress } from '@mui/material';
+import { Box, Typography, Paper, CircularProgress, Tabs, Tab, Divider } from '@mui/material';
 import { PlayCircleOutline } from '@mui/icons-material';
 import { type Lesson, type Course } from '../../models/course';
 import VideoPlayer from './VideoPlayer';
@@ -48,6 +48,11 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
   onVideoTimeUpdate,
   initialVideoTime = 0,
 }) => {
+  const [tabValue, setTabValue] = React.useState(0);
+
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
   return (
     <Box>
       <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
@@ -129,26 +134,71 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
         )}
       </Paper>
 
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>About this lesson</Typography>
-        <Typography variant="body1" color="text.secondary">
-          {lesson.description || 'No description provided.'}
-        </Typography>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange} 
+          textColor="primary" 
+          indicatorColor="primary"
+          sx={{
+            '& .MuiTab-root': { fontWeight: 700, textTransform: 'none', minWidth: 100 }
+          }}
+        >
+          <Tab label="Overview" />
+          <Tab label="Q&A" />
+          <Tab label="Reviews" />
+          {lesson.content_type === 'code' && <Tab label="Resources" />}
+        </Tabs>
       </Box>
 
-      {onPostDiscussion && (
-        <DiscussionThread 
-          discussions={discussions} 
-          onPost={onPostDiscussion} 
-        />
-      )}
+      <Box sx={{ py: 2 }}>
+        {tabValue === 0 && (
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>About this lesson</Typography>
+            <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
+              {lesson.description || 'No description provided for this lesson.'}
+            </Typography>
+            
+            <Divider sx={{ my: 4 }} />
+            
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Course Description</Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+              {course.description || 'Welcome to this course!'}
+            </Typography>
+          </Box>
+        )}
 
-      {onRateCourse && (
-        <CourseRating 
-          ratings={ratings} 
-          onRate={onRateCourse} 
-        />
-      )}
+        {tabValue === 1 && (
+          <Box>
+            {onPostDiscussion && (
+              <DiscussionThread 
+                discussions={discussions} 
+                onPost={onPostDiscussion} 
+              />
+            )}
+          </Box>
+        )}
+
+        {tabValue === 2 && (
+          <Box>
+            {onRateCourse && (
+              <CourseRating 
+                ratings={ratings} 
+                onRate={onRateCourse} 
+              />
+            )}
+          </Box>
+        )}
+
+        {tabValue === 3 && lesson.content_type === 'code' && (
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 800, mb: 2 }}>Coding Exercise Resources</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Use the built-in editor above to solve the exercise. If you get stuck, check the Q&A tab.
+            </Typography>
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };

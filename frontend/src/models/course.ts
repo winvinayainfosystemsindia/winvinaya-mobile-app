@@ -1,5 +1,6 @@
 export interface Lesson {
   id?: number;
+  public_id: string;
   title: string;
   description?: string;
   content_type: 'video' | 'document' | 'text' | 'quiz' | 'assignment' | 'ppt' | 'code' | 'interactive_video';
@@ -20,6 +21,7 @@ export interface Module {
 
 export interface Course {
   id?: number;
+  public_id: string;
   title: string;
   description?: string;
   short_description?: string;
