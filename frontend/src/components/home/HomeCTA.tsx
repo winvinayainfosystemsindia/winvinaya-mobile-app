@@ -4,14 +4,14 @@ import { designTokens } from '../../theme/designTokens';
 
 const HomeCTA: React.FC = () => {
   return (
-    <Box sx={{ bgcolor: 'white', py: 10, px: 2 }}>
+    <Box sx={{ bgcolor: designTokens.colors.surface, py: 8, px: 2 }}>
       <Container maxWidth="lg">
         <Box
           sx={{
-            py: { xs: 8, md: 12 },
+            py: { xs: 8, md: 10 },
             px: { xs: 4, md: 10 },
-            borderRadius: '40px',
-            background: `linear-gradient(135deg, ${designTokens.colors.primary} 0%, #3470ec 100%)`,
+            borderRadius: '32px',
+            background: `linear-gradient(135deg, ${designTokens.colors.primary} 0%, ${designTokens.colors.primaryDark} 100%)`,
             color: 'white',
             textAlign: 'center',
             position: 'relative',
@@ -24,7 +24,7 @@ const HomeCTA: React.FC = () => {
               variant="h2"
               sx={{
                 fontWeight: 900,
-                fontSize: { xs: '2.25rem', md: '3.75rem' },
+                fontSize: { xs: '2.25rem', md: '3.5rem' },
                 mb: 3,
                 letterSpacing: '-0.02em',
                 lineHeight: 1.1,
@@ -55,9 +55,9 @@ const HomeCTA: React.FC = () => {
                   py: 2.5,
                   fontSize: '1.125rem',
                   fontWeight: 800,
-                  borderRadius: '16px',
+                  borderRadius: `${designTokens.shape.cardBorderRadius}px`,
                   boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
-                  '&:hover': { bgcolor: '#f1f5f9', transform: 'translateY(-2px)' },
+                  '&:hover': { bgcolor: designTokens.colors.sidebarHover, transform: 'translateY(-2px)' },
                 }}
               >
                 Get Started Free
@@ -72,7 +72,7 @@ const HomeCTA: React.FC = () => {
                   py: 2.5,
                   fontSize: '1.125rem',
                   fontWeight: 800,
-                  borderRadius: '16px',
+                  borderRadius: `${designTokens.shape.cardBorderRadius}px`,
                   backdropFilter: 'blur(10px)',
                   '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)', borderWidth: '2px' },
                 }}

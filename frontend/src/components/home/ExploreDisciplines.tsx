@@ -2,10 +2,11 @@ import React from 'react';
 import { Box, Container, Typography, Button, Paper, Grid } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
 import { CATEGORIES } from '../../data/home/homeData';
+import { designTokens } from '../../theme/designTokens';
 
 const ExploreDisciplines: React.FC = () => {
   return (
-    <Box sx={{ py: 8, borderBottom: '1px solid #f1f5f9' }}>
+    <Box sx={{ py: 8, borderBottom: `1px solid ${designTokens.colors.border}` }}>
       <Container maxWidth="lg">
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 6 }}>
@@ -16,20 +17,20 @@ const ExploreDisciplines: React.FC = () => {
                 fontWeight: 900,
                 mb: 1.5,
                 fontSize: { xs: '1.75rem', md: '2.25rem' },
-                color: '#0f172a',
+                color: designTokens.colors.textPrimary,
                 letterSpacing: '-0.02em'
               }}
             >
               Explore Disciplines
             </Typography>
-            <Typography variant="body1" sx={{ color: '#64748b', maxWidth: 500, fontSize: '1rem', lineHeight: 1.6 }}>
+            <Typography variant="body1" sx={{ color: designTokens.colors.textSecondary, maxWidth: 500, fontSize: '1rem', lineHeight: 1.6 }}>
               Discover curated pathways across the most impactful fields of study, designed for academic excellence.
             </Typography>
           </Box>
           <Button
             endIcon={<ArrowForward sx={{ fontSize: 18 }} />}
             sx={{
-              color: '#0055d1',
+              color: designTokens.colors.primary,
               fontWeight: 700,
               textTransform: 'none',
               fontSize: '1rem',
@@ -76,11 +77,11 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
       elevation={0}
       sx={{
         p: 3,
-        borderRadius: '20px',
-        bgcolor: isFeature ? '#0055d1' : '#ffffff',
+        borderRadius: `${designTokens.shape.cardBorderRadius}px`,
+        bgcolor: isFeature ? designTokens.colors.primary : designTokens.colors.surface,
         color: isFeature ? '#ffffff' : 'inherit',
-        border: isFeature ? 'none' : '1px solid #f1f5f9',
-        boxShadow: isFeature ? 'none' : '0 4px 20px rgba(0,0,0,0.02)',
+        border: isFeature ? 'none' : `1px solid ${designTokens.colors.border}`,
+        boxShadow: isFeature ? 'none' : designTokens.shadows.card,
         position: 'relative',
         height: '100%',
         display: 'flex',
@@ -90,8 +91,8 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
         overflow: 'hidden',
         '&:hover': {
           transform: 'translateY(-8px)',
-          boxShadow: isFeature ? '0 30px 60px rgba(0, 85, 209, 0.25)' : '0 20px 40px rgba(0,0,0,0.06)',
-          borderColor: isFeature ? 'none' : '#e2e8f0'
+          boxShadow: isFeature ? '0 30px 60px rgba(0, 85, 209, 0.25)' : designTokens.shadows.cardHover,
+          borderColor: isFeature ? 'none' : designTokens.colors.border
         }
       }}
     >
@@ -100,7 +101,7 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
           <Box
             sx={{
               width: 40, height: 40, borderRadius: '10px',
-              bgcolor: 'rgba(241, 245, 249, 1)',
+              bgcolor: designTokens.colors.sidebarHover,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               mb: 2.5, color: cat.color
             }}
@@ -114,7 +115,7 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
           sx={{
             fontWeight: 900,
             mb: 1.5,
-            color: isFeature ? '#fff' : '#0f172a',
+            color: isFeature ? '#fff' : designTokens.colors.textPrimary,
             fontSize: isFeature ? '1.75rem' : '1.25rem',
             letterSpacing: '-0.02em',
             lineHeight: 1.2
@@ -124,7 +125,7 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
         </Typography>
         <Typography
           sx={{
-            color: isFeature ? 'rgba(255,255,255,0.9)' : '#64748b',
+            color: isFeature ? 'rgba(255,255,255,0.9)' : designTokens.colors.textSecondary,
             fontSize: '0.925rem',
             mb: 2.5,
             lineHeight: 1.6,
@@ -161,7 +162,7 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
           ) : (
             <Typography
               sx={{
-                color: '#0055d1',
+                color: designTokens.colors.primary,
                 fontWeight: 800,
                 fontSize: '0.95rem',
                 display: 'flex',

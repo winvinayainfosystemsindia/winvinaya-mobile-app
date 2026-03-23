@@ -5,7 +5,7 @@ import { VerifiedUser } from '@mui/icons-material';
 
 const Hero: React.FC = () => {
   return (
-    <Box sx={{ bgcolor: 'white', py: { xs: 10, md: 15 }, px: 2, overflow: 'hidden' }}>
+    <Box sx={{ bgcolor: designTokens.colors.surface, py: { xs: 8, md: 10 }, px: 2, overflow: 'hidden' }}>
       <Container maxWidth="lg">
         <Grid container alignItems="center" spacing={8}>
           <Grid size={{ xs: 12, md: 7 }}>
@@ -16,9 +16,9 @@ const Hero: React.FC = () => {
                   display: 'inline-block',
                   px: 2,
                   py: 0.5,
-                  borderRadius: '100px',
-                  bgcolor: '#dae2ff',
-                  color: '#0040a1',
+                  borderRadius: designTokens.shape.pillRadius,
+                  bgcolor: designTokens.colors.primaryLight,
+                  color: designTokens.colors.primaryDark,
                   fontSize: '12px',
                   fontWeight: 600,
                   textTransform: 'uppercase',
@@ -32,7 +32,7 @@ const Hero: React.FC = () => {
               variant="h1"
               sx={{
                 fontWeight: 900,
-                fontSize: { xs: '3rem', md: '4.5rem' },
+                fontSize: { xs: '2.5rem', md: '3.75rem' },
                 lineHeight: 1.1,
                 mb: 3,
                 color: designTokens.colors.textPrimary,
@@ -62,8 +62,8 @@ const Hero: React.FC = () => {
                   py: 2,
                   fontSize: '1.1rem',
                   fontWeight: 700,
-                  borderRadius: '12px',
-                  boxShadow: '0 10px 20px rgba(0, 85, 209, 0.2)',
+                  borderRadius: `${designTokens.shape.borderRadius}px`,
+                  boxShadow: `0 10px 20px rgba(0, 86, 210, 0.15)`,
                   textTransform: 'none',
                 }}
               >
@@ -76,10 +76,10 @@ const Hero: React.FC = () => {
                   py: 2,
                   fontSize: '1.1rem',
                   fontWeight: 700,
-                  borderRadius: '12px',
-                  bgcolor: '#e6e8f2',
-                  color: '#37485b',
-                  '&:hover': { bgcolor: '#d8dae3' },
+                  borderRadius: `${designTokens.shape.borderRadius}px`,
+                  bgcolor: designTokens.colors.secondaryLight,
+                  color: designTokens.colors.secondaryDark,
+                  '&:hover': { bgcolor: '#e2e5ec' },
                   textTransform: 'none',
                   boxShadow: 'none',
                 }}
@@ -133,11 +133,11 @@ const Hero: React.FC = () => {
                   <Box
                     sx={{
                       width: 40, height: 40, borderRadius: '10px',
-                      bgcolor: '#e6f9f4', display: 'flex',
+                      bgcolor: designTokens.colors.tertiaryLight, display: 'flex',
                       alignItems: 'center', justifyContent: 'center'
                     }}
                   >
-                    <VerifiedUser sx={{ color: designTokens.colors.success }} />
+                    <VerifiedUser sx={{ color: designTokens.colors.tertiary }} />
                   </Box>
                   <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>Certified Content</Typography>
                 </Stack>

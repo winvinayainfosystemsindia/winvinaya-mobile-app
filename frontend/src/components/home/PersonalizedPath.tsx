@@ -5,23 +5,22 @@ import { designTokens } from '../../theme/designTokens';
 
 const PersonalizedPath: React.FC = () => {
   return (
-    <Box sx={{ bgcolor: '#f1f5f9', py: 15, px: 2, overflow: 'hidden', position: 'relative' }}>
+    <Box sx={{ bgcolor: designTokens.colors.sidebarHover, py: 10, px: 2, overflow: 'hidden', position: 'relative' }}>
       <Container maxWidth="lg">
         <Stack direction={{ xs: 'column', lg: 'row' }} spacing={12} alignItems="center">
           <Box sx={{ flex: 1, position: 'relative', order: { xs: 2, lg: 1 } }}>
             <Paper
               elevation={20}
               sx={{
-                p: 5,
-                borderRadius: '24px',
-                maxWidth: 440,
+                p: { xs: 3, md: 4 },
+                borderRadius: `${designTokens.shape.cardBorderRadius}px`,
                 mx: 'auto',
                 position: 'relative',
                 zIndex: 2,
                 border: '1px solid rgba(0,0,0,0.05)',
               }}
             >
-              <Typography variant="h5" sx={{ fontWeight: 800, mb: 5 }}>Your Learning Path</Typography>
+              <Typography variant="h5" sx={{ fontWeight: 800, mb: 4, color: designTokens.colors.textPrimary, fontSize: '1.25rem' }}>Your Learning Path</Typography>
               
               <Stack spacing={4}>
                 <Box>
@@ -33,8 +32,8 @@ const PersonalizedPath: React.FC = () => {
                     variant="determinate" 
                     value={78} 
                     sx={{ 
-                      height: 8, borderRadius: 10, bgcolor: '#e2e8f0',
-                      '& .MuiLinearProgress-bar': { borderRadius: 10, background: 'linear-gradient(90deg, #006b4f 0%, #008765 100%)' }
+                      height: 8, borderRadius: 10, bgcolor: designTokens.colors.border,
+                      '& .MuiLinearProgress-bar': { borderRadius: 10, background: `linear-gradient(90deg, ${designTokens.colors.tertiaryDark} 0%, ${designTokens.colors.tertiary} 100%)` }
                     }} 
                   />
                 </Box>
@@ -48,8 +47,8 @@ const PersonalizedPath: React.FC = () => {
                     variant="determinate" 
                     value={32} 
                     sx={{ 
-                      height: 8, borderRadius: 10, bgcolor: '#e2e8f0',
-                      '& .MuiLinearProgress-bar': { borderRadius: 10, background: 'linear-gradient(90deg, #006b4f 0%, #008765 100%)' }
+                      height: 8, borderRadius: 10, bgcolor: designTokens.colors.border,
+                      '& .MuiLinearProgress-bar': { borderRadius: 10, background: `linear-gradient(90deg, ${designTokens.colors.tertiaryDark} 0%, ${designTokens.colors.tertiary} 100%)` }
                     }} 
                   />
                 </Box>
@@ -58,14 +57,14 @@ const PersonalizedPath: React.FC = () => {
                   fullWidth
                   variant="contained"
                   startIcon={<PlayCircle />}
-                  sx={{
-                    bgcolor: '#e6e8f2',
-                    color: '#3470ec',
+                   sx={{
+                    bgcolor: designTokens.colors.primaryLight,
+                    color: designTokens.colors.primary,
                     fontWeight: 800,
-                    py: 2,
-                    borderRadius: '12px',
+                    py: 1.5,
+                    borderRadius: `${designTokens.shape.borderRadius}px`,
                     boxShadow: 'none',
-                    '&:hover': { bgcolor: '#d8dae3' }
+                    '&:hover': { bgcolor: '#dae7ff' }
                   }}
                 >
                   Continue Course
@@ -79,10 +78,10 @@ const PersonalizedPath: React.FC = () => {
           </Box>
           
           <Box sx={{ flex: 1, order: { xs: 1, lg: 2 } }}>
-            <Typography variant="h2" sx={{ fontWeight: 900, fontSize: { xs: '2.5rem', md: '3.5rem' }, mb: 3, lineHeight: 1.1 }}>
-              Tailored to <Typography component="span" variant="inherit" sx={{ color: designTokens.colors.success }}>Your Ambition</Typography>
+            <Typography variant="h2" sx={{ fontWeight: 900, fontSize: { xs: '2rem', md: '2.75rem' }, mb: 3, lineHeight: 1.1, color: designTokens.colors.textPrimary }}>
+              Tailored to <Typography component="span" variant="inherit" sx={{ color: designTokens.colors.tertiary }}>Your Ambition</Typography>
             </Typography>
-            <Typography variant="body1" sx={{ color: 'text.secondary', fontSize: '1.1rem', mb: 5, lineHeight: 1.8, fontWeight: 300 }}>
+            <Typography variant="body1" sx={{ color: designTokens.colors.textSecondary, fontSize: '1rem', mb: 4, lineHeight: 1.8, fontWeight: 300 }}>
               Our intelligent curator analyzes your progress and interests to suggest advanced tracks that build upon your current foundation.
             </Typography>
             
@@ -104,14 +103,14 @@ const PersonalizedPath: React.FC = () => {
             <Button
               variant="contained"
               sx={{
-                bgcolor: '#191c23',
+                bgcolor: designTokens.colors.secondaryDark,
                 color: 'white',
                 px: 5,
-                py: 2,
-                borderRadius: '12px',
-                fontSize: '1.1rem',
+                py: 1.8,
+                borderRadius: `${designTokens.shape.borderRadius}px`,
+                fontSize: '1rem',
                 fontWeight: 700,
-                '&:hover': { bgcolor: '#2d323d' }
+                '&:hover': { bgcolor: designTokens.colors.secondary }
               }}
             >
               Explore Recommendations

@@ -2,50 +2,51 @@ import React from 'react';
 import { Box, Container, Typography, Grid, IconButton, Rating, Paper } from '@mui/material';
 import { ChevronLeft, ChevronRight, AddShoppingCart, Star } from '@mui/icons-material';
 import { TRENDING_COURSES } from '../../data/home/homeData';
+import { designTokens } from '../../theme/designTokens';
 
 const TrendingKnowledge: React.FC = () => {
   return (
-    <Box sx={{ bgcolor: '#ffffff', py: 12 }}>
-      <Container maxWidth="xl">
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 8 }}>
+    <Box sx={{ bgcolor: designTokens.colors.surface, py: 8 }}>
+      <Container maxWidth="lg">
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6 }}>
           <Box>
             <Typography
               variant="h3"
               sx={{
                 fontWeight: 900,
-                fontSize: { xs: '2rem', md: '2.5rem' },
-                color: '#0f172a',
-                letterSpacing: '-0.03em',
+                fontSize: { xs: '1.75rem', md: '2.25rem' },
+                color: designTokens.colors.textPrimary,
+                letterSpacing: '-0.02em',
                 mb: 1
               }}
             >
               Trending Knowledge
             </Typography>
-            <Typography variant="body1" sx={{ color: '#64748b', fontSize: '1.1rem' }}>
+            <Typography variant="body1" sx={{ color: designTokens.colors.textSecondary, fontSize: '1rem' }}>
               Most-watched courses from the world's leading experts.
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', gap: 2 }}>
             <IconButton
               sx={{
-                width: 50,
-                height: 50,
-                border: '1px solid #e2e8f0',
-                bgcolor: 'white',
-                color: '#0f172a',
-                '&:hover': { bgcolor: '#f8fafc', borderColor: '#cbd5e1' }
+                width: 44,
+                height: 44,
+                border: `1px solid ${designTokens.colors.border}`,
+                bgcolor: designTokens.colors.surface,
+                color: designTokens.colors.textPrimary,
+                '&:hover': { bgcolor: designTokens.colors.bg, borderColor: designTokens.colors.border }
               }}
             >
               <ChevronLeft />
             </IconButton>
             <IconButton
               sx={{
-                width: 50,
-                height: 50,
-                border: '1px solid #e2e8f0',
-                bgcolor: 'white',
-                color: '#0f172a',
-                '&:hover': { bgcolor: '#f8fafc', borderColor: '#cbd5e1' }
+                width: 44,
+                height: 44,
+                border: `1px solid ${designTokens.colors.border}`,
+                bgcolor: designTokens.colors.surface,
+                color: designTokens.colors.textPrimary,
+                '&:hover': { bgcolor: designTokens.colors.bg, borderColor: designTokens.colors.border }
               }}
             >
               <ChevronRight />
@@ -70,10 +71,10 @@ const CourseCard = ({ course }: { course: any }) => {
     <Paper
       elevation={0}
       sx={{
-        borderRadius: '20px',
+        borderRadius: `${designTokens.shape.cardBorderRadius}px`,
         overflow: 'hidden',
-        bgcolor: '#ffffff',
-        border: '1px solid #f1f5f9',
+        bgcolor: designTokens.colors.surface,
+        border: `1px solid ${designTokens.colors.border}`,
         transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
         cursor: 'pointer',
         height: '100%',
@@ -81,10 +82,10 @@ const CourseCard = ({ course }: { course: any }) => {
         flexDirection: 'column',
         '&:hover': {
           transform: 'translateY(-10px)',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.08)',
-          borderColor: '#e2e8f0',
+          boxShadow: designTokens.shadows.cardHover,
+          borderColor: designTokens.colors.border,
           '& .course-image': { transform: 'scale(1.08)' },
-          '& .cart-btn': { bgcolor: '#0055d1', color: 'white' }
+          '& .cart-btn': { bgcolor: designTokens.colors.primary, color: 'white' }
         }
       }}
     >
@@ -107,8 +108,8 @@ const CourseCard = ({ course }: { course: any }) => {
           <Box
             sx={{
               position: 'absolute', top: 16, left: 16,
-              bgcolor: '#ffffff',
-              color: '#0f172a',
+              bgcolor: designTokens.colors.surface,
+              color: designTokens.colors.textPrimary,
               px: 1.5,
               py: 0.6,
               borderRadius: '6px',
@@ -130,7 +131,7 @@ const CourseCard = ({ course }: { course: any }) => {
       <Box sx={{ p: 4, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
         <Typography
           sx={{
-            color: '#10b981',
+            color: designTokens.colors.tertiary,
             fontWeight: 800,
             textTransform: 'uppercase',
             letterSpacing: '0.1em',
@@ -145,9 +146,9 @@ const CourseCard = ({ course }: { course: any }) => {
           sx={{
             fontWeight: 800,
             mb: 1.5,
-            fontSize: '1.2rem',
+            fontSize: '1.1rem',
             lineHeight: 1.3,
-            color: '#0f172a',
+            color: designTokens.colors.textPrimary,
             height: '3.12rem',
             overflow: 'hidden',
             display: '-webkit-box',
@@ -160,9 +161,9 @@ const CourseCard = ({ course }: { course: any }) => {
 
         <Typography
           sx={{
-            color: '#64748b',
+            color: designTokens.colors.textSecondary,
             fontSize: '0.9rem',
-            mb: 2.5,
+            mb: 2,
             fontWeight: 500
           }}
         >
@@ -170,16 +171,16 @@ const CourseCard = ({ course }: { course: any }) => {
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 'auto' }}>
-          <Typography sx={{ fontWeight: 800, fontSize: '0.95rem', color: '#0f172a' }}>{course.rating}</Typography>
+          <Typography sx={{ fontWeight: 800, fontSize: '0.9rem', color: designTokens.colors.textPrimary }}>{course.rating}</Typography>
           <Rating
             value={course.rating}
             precision={0.1}
             readOnly
             size="small"
-            icon={<Star fontSize="inherit" sx={{ color: '#f59e0b' }} />}
-            emptyIcon={<Star fontSize="inherit" sx={{ color: '#e2e8f0' }} />}
+            icon={<Star fontSize="inherit" sx={{ color: designTokens.colors.accent }} />}
+            emptyIcon={<Star fontSize="inherit" sx={{ color: designTokens.colors.border }} />}
           />
-          <Typography sx={{ color: '#94a3b8', fontSize: '0.85rem' }}>({course.reviews.toLocaleString()})</Typography>
+          <Typography sx={{ color: designTokens.colors.textSecondary, fontSize: '0.85rem', opacity: 0.8 }}>({course.reviews.toLocaleString()})</Typography>
         </Box>
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 4 }}>
@@ -187,8 +188,8 @@ const CourseCard = ({ course }: { course: any }) => {
             variant="h4"
             sx={{
               fontWeight: 900,
-              fontSize: '1.75rem',
-              color: '#0f172a',
+              fontSize: '1.5rem',
+              color: designTokens.colors.textPrimary,
               letterSpacing: '-0.02em'
             }}
           >
@@ -197,12 +198,12 @@ const CourseCard = ({ course }: { course: any }) => {
           <IconButton
             className="cart-btn"
             sx={{
-              width: 44,
-              height: 44,
-              bgcolor: '#f1f5f9',
-              color: '#0055d1',
+              width: 40,
+              height: 40,
+              bgcolor: designTokens.colors.sidebarHover,
+              color: designTokens.colors.primary,
               transition: 'all 0.3s',
-              '&:hover': { bgcolor: '#0055d1', color: 'white' }
+              '&:hover': { bgcolor: designTokens.colors.primary, color: 'white' }
             }}
           >
             <AddShoppingCart fontSize="small" />

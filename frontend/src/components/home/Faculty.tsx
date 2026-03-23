@@ -1,14 +1,15 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Stack, Divider } from '@mui/material';
 import { FACULTY } from '../../data/home/homeData';
+import { designTokens } from '../../theme/designTokens';
 
 const Faculty: React.FC = () => {
   return (
-    <Box sx={{ bgcolor: 'white', py: 15, px: 2 }}>
+    <Box sx={{ bgcolor: designTokens.colors.surface, py: 10, px: 2 }}>
       <Container maxWidth="lg">
-        <Box sx={{ textAlign: 'center', mb: 12 }}>
-          <Typography variant="h2" sx={{ fontWeight: 800, mb: 2, fontSize: '2.5rem' }}>World-Class Faculty</Typography>
-          <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 600, mx: 'auto' }}>
+        <Box sx={{ textAlign: 'center', mb: 8 }}>
+          <Typography variant="h2" sx={{ fontWeight: 800, mb: 2, fontSize: '2rem', color: designTokens.colors.textPrimary }}>World-Class Faculty</Typography>
+          <Typography variant="body1" sx={{ color: designTokens.colors.textSecondary, maxWidth: 600, mx: 'auto' }}>
             Learn from the leading minds shaping the future of global industry and academia.
           </Typography>
         </Box>
@@ -19,9 +20,9 @@ const Faculty: React.FC = () => {
               <Box sx={{ textAlign: 'center' }}>
                 <Box
                   sx={{
-                    width: 200, height: 200, borderRadius: '50%',
-                    mx: 'auto', mb: 4, overflow: 'hidden',
-                    position: 'relative', boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                    width: 160, height: 160, borderRadius: '50%',
+                    mx: 'auto', mb: 3, overflow: 'hidden',
+                    position: 'relative', boxShadow: designTokens.shadows.card,
                     '& img': {
                       width: '100%', height: '100%', objectFit: 'cover',
                       filter: 'grayscale(100%)', transition: 'all 0.5s ease',
@@ -33,23 +34,23 @@ const Faculty: React.FC = () => {
                   <Box sx={{ position: 'absolute', inset: 0, border: '6px solid rgba(255,255,255,0.2)', borderRadius: '50%' }} />
                 </Box>
 
-                <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>{member.name}</Typography>
-                <Typography sx={{ color: member.tagColor, fontWeight: 700, fontSize: '0.875rem', mb: 2 }}>
+                <Typography variant="h5" sx={{ fontWeight: 800, mb: 1, color: designTokens.colors.textPrimary, fontSize: '1.25rem' }}>{member.name}</Typography>
+                <Typography sx={{ color: member.tagColor, fontWeight: 700, fontSize: '0.85rem', mb: 1.5 }}>
                   {member.title}
                 </Typography>
-                <Typography variant="body2" sx={{ color: 'text.secondary', px: 2, mb: 4, lineHeight: 1.6 }}>
+                <Typography variant="body2" sx={{ color: designTokens.colors.textSecondary, px: 2, mb: 3, lineHeight: 1.6 }}>
                   {member.desc}
                 </Typography>
 
                 <Stack direction="row" spacing={3} justifyContent="center" alignItems="center">
                   <Box>
-                    <Typography sx={{ fontWeight: 900, fontSize: '1.25rem' }}>{member.students}</Typography>
-                    <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, opacity: 0.5 }}>Students</Typography>
+                    <Typography sx={{ fontWeight: 900, fontSize: '1.1rem', color: designTokens.colors.textPrimary }}>{member.students}</Typography>
+                    <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, color: designTokens.colors.textSecondary, opacity: 0.7 }}>Students</Typography>
                   </Box>
                   <Divider orientation="vertical" flexItem sx={{ borderStyle: 'dashed' }} />
                   <Box>
-                    <Typography sx={{ fontWeight: 900, fontSize: '1.25rem' }}>{member.courses}</Typography>
-                    <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, opacity: 0.5 }}>Courses</Typography>
+                    <Typography sx={{ fontWeight: 900, fontSize: '1.1rem', color: designTokens.colors.textPrimary }}>{member.courses}</Typography>
+                    <Typography variant="caption" sx={{ textTransform: 'uppercase', fontWeight: 800, color: designTokens.colors.textSecondary, opacity: 0.7 }}>Courses</Typography>
                   </Box>
                 </Stack>
               </Box>
