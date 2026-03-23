@@ -5,24 +5,24 @@ import { CATEGORIES } from '../../data/home/homeData';
 
 const ExploreDisciplines: React.FC = () => {
   return (
-    <Box sx={{ py: 12, borderBottom: '1px solid #f1f5f9' }}>
-      <Container maxWidth="xl">
+    <Box sx={{ py: 8, borderBottom: '1px solid #f1f5f9' }}>
+      <Container maxWidth="lg">
         {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 8 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', mb: 6 }}>
           <Box>
             <Typography
               variant="h3"
               sx={{
                 fontWeight: 900,
-                mb: 2,
-                fontSize: { xs: '2rem', md: '2.75rem' },
+                mb: 1.5,
+                fontSize: { xs: '1.75rem', md: '2.25rem' },
                 color: '#0f172a',
-                letterSpacing: '-0.03em'
+                letterSpacing: '-0.02em'
               }}
             >
               Explore Disciplines
             </Typography>
-            <Typography variant="body1" sx={{ color: '#64748b', maxWidth: 500, fontSize: '1.1rem', lineHeight: 1.6 }}>
+            <Typography variant="body1" sx={{ color: '#64748b', maxWidth: 500, fontSize: '1rem', lineHeight: 1.6 }}>
               Discover curated pathways across the most impactful fields of study, designed for academic excellence.
             </Typography>
           </Box>
@@ -41,10 +41,10 @@ const ExploreDisciplines: React.FC = () => {
         </Box>
 
         {/* Categories Grid - Using Grid2 for matching Hero.tsx */}
-        <Grid container spacing={4}>
+        <Grid container spacing={3}>
           {/* Left Columns (4 cards in 2 columns) */}
           <Grid size={{ xs: 12, md: 8 }}>
-            <Grid container spacing={4}>
+            <Grid container spacing={3}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <CategoryCard cat={CATEGORIES[0]} />
               </Grid>
@@ -75,8 +75,8 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
     <Paper
       elevation={0}
       sx={{
-        p: 5,
-        borderRadius: '24px',
+        p: 3,
+        borderRadius: '20px',
         bgcolor: isFeature ? '#0055d1' : '#ffffff',
         color: isFeature ? '#ffffff' : 'inherit',
         border: isFeature ? 'none' : '1px solid #f1f5f9',
@@ -99,13 +99,13 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
         {!isFeature && (
           <Box
             sx={{
-              width: 48, height: 48, borderRadius: '12px',
+              width: 40, height: 40, borderRadius: '10px',
               bgcolor: 'rgba(241, 245, 249, 1)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              mb: 4, color: cat.color
+              mb: 2.5, color: cat.color
             }}
           >
-            {React.cloneElement(cat.icon as React.ReactElement<any>, { sx: { fontSize: 24 } })}
+            {React.cloneElement(cat.icon as React.ReactElement<any>, { sx: { fontSize: 20 } })}
           </Box>
         )}
 
@@ -113,9 +113,9 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
           variant="h4"
           sx={{
             fontWeight: 900,
-            mb: 2,
+            mb: 1.5,
             color: isFeature ? '#fff' : '#0f172a',
-            fontSize: isFeature ? '2.5rem' : '1.75rem',
+            fontSize: isFeature ? '1.75rem' : '1.25rem',
             letterSpacing: '-0.02em',
             lineHeight: 1.2
           }}
@@ -125,8 +125,8 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
         <Typography
           sx={{
             color: isFeature ? 'rgba(255,255,255,0.9)' : '#64748b',
-            fontSize: '1rem',
-            mb: 4,
+            fontSize: '0.925rem',
+            mb: 2.5,
             lineHeight: 1.6,
             maxWidth: isFeature ? '100%' : '90%'
           }}
@@ -144,10 +144,10 @@ const CategoryCard = ({ cat, isFeature }: { cat: any, isFeature?: boolean }) => 
                 color: '#fff',
                 backdropFilter: 'blur(12px)',
                 fontWeight: 900,
-                py: 2.5,
-                borderRadius: '16px',
+                py: 1.5,
+                borderRadius: '12px',
                 textTransform: 'none',
-                fontSize: '1rem',
+                fontSize: '0.95rem',
                 boxShadow: 'none',
                 border: '1px solid rgba(255,255,255,0.2)',
                 '&:hover': {
