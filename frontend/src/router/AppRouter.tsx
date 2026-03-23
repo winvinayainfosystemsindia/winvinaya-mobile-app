@@ -36,7 +36,7 @@ const Layout: React.FC = () => {
   const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate('/');
   };
 
   return (
@@ -69,9 +69,9 @@ const AppRouter: React.FC = () => {
       
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
-        <Route path="/catalog" element={<CourseCatalog />} />
-        <Route path="/courses/:courseId" element={<CourseDetails />} />
         <Route element={<ProtectedRoute />}>
+          <Route path="/catalog" element={<CourseCatalog />} />
+          <Route path="/courses/:courseId" element={<CourseDetails />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
         <Route path="/page-not-found" element={<NotFound />} />
