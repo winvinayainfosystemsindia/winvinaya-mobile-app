@@ -7,26 +7,26 @@ import {
 	IconButton,
 	Paper,
 	InputBase,
-	Tooltip,
 	Avatar,
 	Menu,
 	MenuItem,
 	Stack,
 	Button,
 	Divider,
-	useTheme
+	useTheme,
+	Link,
+	Container,
+	Badge
 } from '@mui/material';
 import {
 	Menu as MenuIcon,
 	Search as SearchIcon,
 	FavoriteBorder as FavoriteBorderIcon,
-	ShoppingBag as ShoppingBagIcon,
-	Notifications as NotificationsIcon,
-	Language as LanguageIcon
+	NotificationsNone as NotificationsIcon,
+	PersonOutline as PersonIcon
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import type { User } from '../../models/auth';
-import { designTokens } from '../../theme/designTokens';
 
 interface NavbarProps {
 	user: User | null;
@@ -60,197 +60,178 @@ const Navbar: React.FC<NavbarProps> = ({
 		handleMenuClose();
 	};
 
+	const navLinks = [
+		{ text: 'Categories', path: '/catalog' },
+		{ text: 'My Learning', path: '/my-learning' },
+		{ text: 'Teach', path: '/teach' },
+		{ text: 'Instructor', path: '/dashboard' },
+	];
+
 	return (
 		<AppBar
 			position="fixed"
 			sx={{
 				zIndex: theme.zIndex.drawer + 1,
 				bgcolor: '#ffffff',
-				borderBottom: `1px solid ${designTokens.colors.border}`,
+				borderBottom: '1px solid #f1f5f9',
 				height: 72,
 				justifyContent: 'center'
 			}}
 			elevation={0}
 		>
-			<Toolbar sx={{ px: { xs: 2, md: 4 }, gap: 2 }}>
-				{isMobile && (
-					<IconButton
-						edge="start"
-						onClick={onDrawerToggle}
-						sx={{ mr: 1, color: designTokens.colors.dark }}
-					>
-						<MenuIcon />
-					</IconButton>
-				)}
-
-				{/* Logo */}
-				<Box
-					sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mr: 2 }}
-					onClick={() => navigate('/')}
-				>
-					<Box
-						component="img"
-						src="/assets/images/Nammacademy_Logo.png"
-						alt="Nammacademy"
-						sx={{ height: 48, width: 'auto' }}
-						onError={(e: any) => {
-							e.target.style.display = 'none';
-						}}
-					/>
-					{!isMobile && (
-						<Typography sx={{ fontWeight: 800, fontSize: '20px', ml: 1, color: designTokens.colors.dark }}>
-							Namm<span style={{ color: designTokens.colors.primary }}>Academy</span>
-						</Typography>
+			<Container maxWidth="xl">
+				<Toolbar sx={{ px: { xs: 0 }, gap: { xs: 1, md: 3 } }}>
+					{isMobile && (
+						<IconButton
+							edge="start"
+							onClick={onDrawerToggle}
+							sx={{ mr: 1, color: '#0f172a' }}
+						>
+							<MenuIcon />
+						</IconButton>
 					)}
-				</Box>
 
-				{!isMobile && (
-					<Typography
-						variant="body2"
+					<Box
 						sx={{
+							display: 'flex',
+							alignItems: 'center',
 							cursor: 'pointer',
-							color: designTokens.colors.textPrimary,
-							fontWeight: 500,
-							'&:hover': { color: designTokens.colors.primary }
+							mr: 2,
+							gap: 1.5
 						}}
+						onClick={() => navigate('/')}
 					>
-						Categories
-					</Typography>
-				)}
-
-				{/* Search Bar — Center pill shape */}
-				<Paper
-					component="form"
-					sx={{
-						p: '2px 16px',
-						display: 'flex',
-						alignItems: 'center',
-						flexGrow: 1,
-						bgcolor: '#f7f9fa',
-						borderRadius: 50,
-						border: `1px solid ${designTokens.colors.dark}`,
-						maxWidth: 700,
-						height: 46,
-						boxShadow: 'none',
-						'&:hover': { bgcolor: '#f1f3f4' }
-					}}
-				>
-					<SearchIcon sx={{ fontSize: 20, color: designTokens.colors.textSecondary, mr: 1 }} />
-					<InputBase
-						sx={{ flex: 1, fontSize: '14px' }}
-						placeholder="Search for anything"
-						inputProps={{ 'aria-label': 'search courses' }}
-					/>
-				</Paper>
-
-				{!isMobile && (
-					<Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-						<Typography
-							variant="body2"
-							sx={{
-								cursor: 'pointer',
-								color: designTokens.colors.textPrimary,
-								fontWeight: 500,
-								'&:hover': { color: designTokens.colors.primary }
-							}}
-						>
-							Business
-						</Typography>
-						<Typography
-							variant="body2"
-							sx={{
-								cursor: 'pointer',
-								color: designTokens.colors.textPrimary,
-								fontWeight: 500,
-								'&:hover': { color: designTokens.colors.primary }
-							}}
-						>
-							Teach
-						</Typography>
+						<img
+							src="/assets/images/Nammacademy_Logo.png"
+							alt="Nammacademy Logo"
+							style={{ height: '50px', width: 'auto' }}
+						/>
 					</Box>
-				)}
 
-				<Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-					{isAuthenticated ? (
-						<>
-							{!isMobile && (
-								<Stack direction="row" spacing={1}>
-									<Tooltip title="My Learning">
-										<Button
-											sx={{ color: designTokens.colors.textPrimary, textTransform: 'none', fontWeight: 500 }}
-											onClick={() => navigate('/my-learning')}
-										>
-											My learning
-										</Button>
-									</Tooltip>
-									<IconButton sx={{ color: designTokens.colors.dark }}>
-										<FavoriteBorderIcon fontSize="small" />
-									</IconButton>
-									<IconButton sx={{ color: designTokens.colors.dark }}>
-										<ShoppingBagIcon fontSize="small" />
-									</IconButton>
-									<IconButton sx={{ color: designTokens.colors.dark }}>
-										<NotificationsIcon fontSize="small" />
-									</IconButton>
-								</Stack>
-							)}
-
-							<IconButton
-								onClick={handleMenuOpen}
-								sx={{ p: 0.5 }}
-							>
-								<Avatar
+					{!isMobile && (
+						<Stack direction="row" spacing={3} sx={{ mr: 2 }}>
+							{navLinks.map((link) => (
+								<Link
+									key={link.text}
+									onClick={() => navigate(link.path)}
 									sx={{
-										width: 32,
-										height: 32,
-										bgcolor: designTokens.colors.dark,
-										fontSize: '13px',
-										fontWeight: 700
+										color: '#475569',
+										fontWeight: 600,
+										fontSize: '14px',
+										cursor: 'pointer',
+										textDecoration: 'none',
+										transition: 'color 0.2s',
+										whiteSpace: 'nowrap',
+										'&:hover': { color: '#0055d1' }
 									}}
 								>
-									{user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
-								</Avatar>
-							</IconButton>
-						</>
-					) : (
-						<Stack direction="row" spacing={1}>
-							<Button
-								variant="outlined"
-								sx={{
-									borderColor: designTokens.colors.dark,
-									color: designTokens.colors.dark,
-									fontWeight: 700,
-									borderRadius: 0,
-									height: 40,
-									px: 3,
-									'&:hover': { bgcolor: 'rgba(28,29,31,0.04)', borderColor: designTokens.colors.dark }
-								}}
-								onClick={() => navigate('/login')}
-							>
-								Log in
-							</Button>
-							<Button
-								variant="contained"
-								sx={{
-									bgcolor: designTokens.colors.dark,
-									color: '#ffffff',
-									fontWeight: 700,
-									borderRadius: 0,
-									height: 40,
-									px: 3,
-									'&:hover': { bgcolor: '#000000' }
-								}}
-								onClick={() => navigate('/register')}
-							>
-								Sign up
-							</Button>
-							{!isMobile && (
-								<IconButton sx={{ border: `1px solid ${designTokens.colors.dark}`, borderRadius: 0, height: 40, width: 40 }}>
-									<LanguageIcon fontSize="small" sx={{ color: designTokens.colors.dark }} />
-								</IconButton>
-							)}
+									{link.text}
+								</Link>
+							))}
 						</Stack>
 					)}
+
+					{/* Search Bar */}
+					<Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'flex' }, justifyContent: 'center' }}>
+						<Paper
+							component="form"
+							sx={{
+								p: '2px 14px',
+								display: 'flex',
+								alignItems: 'center',
+								bgcolor: '#f1f5f9',
+								borderRadius: '100px',
+								border: '1px solid #e2e8f0',
+								width: '100%',
+								maxWidth: 500,
+								height: 44,
+								boxShadow: 'none',
+								transition: 'all 0.2s',
+								'&:hover': { bgcolor: '#f1f5f9', borderColor: '#cbd5e1' },
+								'&:focus-within': {
+									bgcolor: '#ffffff',
+									borderColor: '#0055d1',
+									boxShadow: '0 0 0 4px rgba(0, 85, 209, 0.1)'
+								}
+							}}
+						>
+							<SearchIcon sx={{ fontSize: 20, color: '#94a3b8', mr: 1 }} />
+							<InputBase
+								sx={{ flex: 1, fontSize: '14px', fontWeight: 500 }}
+								placeholder="Search for courses..."
+								inputProps={{ 'aria-label': 'search courses' }}
+							/>
+						</Paper>
+					</Box>
+
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1.5 } }}>
+						{isAuthenticated ? (
+							<>
+								<IconButton sx={{ color: '#475569', display: { xs: 'none', md: 'flex' } }}>
+									<FavoriteBorderIcon fontSize="medium" />
+								</IconButton>
+								<IconButton sx={{ color: '#475569' }}>
+									<Badge color="error" variant="dot" overlap="circular">
+										<NotificationsIcon fontSize="medium" />
+									</Badge>
+								</IconButton>
+
+								<IconButton
+									onClick={handleMenuOpen}
+									sx={{
+										p: 0,
+										ml: 1,
+									}}
+								>
+									<Avatar
+										sx={{
+											width: 40,
+											height: 40,
+											bgcolor: '#c2b280',
+											color: '#ffffff',
+											fontSize: '16px',
+											fontWeight: 700
+										}}
+									>
+										<PersonIcon />
+									</Avatar>
+								</IconButton>
+							</>
+						) : (
+							<Stack direction="row" spacing={1.5}>
+								<Button
+									variant="text"
+									sx={{
+										color: '#0f172a',
+										fontWeight: 800,
+										textTransform: 'none',
+										fontSize: '14px'
+									}}
+									onClick={() => navigate('/login')}
+								>
+									Log in
+								</Button>
+								<Button
+									variant="contained"
+									sx={{
+										bgcolor: '#0055d1',
+										color: '#ffffff',
+										fontWeight: 800,
+										borderRadius: '10px',
+										px: 3,
+										py: 1.2,
+										textTransform: 'none',
+										fontSize: '14px',
+										boxShadow: 'none',
+										'&:hover': { bgcolor: '#0040a1', boxShadow: 'none' }
+									}}
+									onClick={() => navigate('/register')}
+								>
+									Sign up
+								</Button>
+							</Stack>
+						)}
+					</Box>
 
 					<Menu
 						anchorEl={anchorEl}
@@ -260,49 +241,51 @@ const Navbar: React.FC<NavbarProps> = ({
 						transformOrigin={{ vertical: 'top', horizontal: 'right' }}
 						PaperProps={{
 							sx: {
-								borderRadius: 0,
-								mt: 1.5,
-								minWidth: 260,
-								boxShadow: designTokens.shadows.dropdown,
-								border: `1px solid ${designTokens.colors.border}`
+								borderRadius: '16px',
+								mt: 2,
+								minWidth: 280,
+								boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)',
+								border: '1px solid #f1f5f9',
+								overflow: 'hidden'
 							}
 						}}
 					>
-						<Box sx={{ px: 2, py: 2 }}>
+						<Box sx={{ px: 2.5, py: 2.5, bgcolor: '#f8fafc' }}>
 							<Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-								<Avatar sx={{ width: 48, height: 48, bgcolor: designTokens.colors.dark }}>
+								<Avatar sx={{ width: 48, height: 48, bgcolor: '#0055d1' }}>
 									{user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
 								</Avatar>
 								<Box sx={{ minWidth: 0 }}>
-									<Typography variant="subtitle2" sx={{ fontWeight: 700 }} noWrap>
+									<Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.2 }} noWrap>
 										{user?.full_name || 'User'}
 									</Typography>
-									<Typography variant="caption" color="text.secondary" noWrap display="block">
+									<Typography variant="caption" sx={{ color: '#64748b' }} noWrap display="block">
 										{user?.email}
 									</Typography>
 								</Box>
 							</Box>
 						</Box>
 						<Divider />
-						<MenuItem onClick={() => { navigate('/my-learning'); handleMenuClose(); }} sx={{ py: 1.2, fontSize: '14px' }}>My learning</MenuItem>
-						<MenuItem onClick={() => { navigate('/cart'); handleMenuClose(); }} sx={{ py: 1.2, fontSize: '14px' }}>My cart</MenuItem>
-						<MenuItem onClick={() => { navigate('/wishlist'); handleMenuClose(); }} sx={{ py: 1.2, fontSize: '14px' }}>Wishlist</MenuItem>
+						<Box sx={{ py: 1 }}>
+							<MenuItem onClick={() => { navigate('/my-learning'); handleMenuClose(); }} sx={{ py: 1.5, px: 2.5, fontSize: '14px', fontWeight: 500 }}>My learning</MenuItem>
+							<MenuItem onClick={() => { navigate('/cart'); handleMenuClose(); }} sx={{ py: 1.5, px: 2.5, fontSize: '14px', fontWeight: 500 }}>My cart</MenuItem>
+							<MenuItem onClick={() => { navigate('/wishlist'); handleMenuClose(); }} sx={{ py: 1.5, px: 2.5, fontSize: '14px', fontWeight: 500 }}>Wishlist</MenuItem>
+						</Box>
 						<Divider />
-						<MenuItem onClick={() => { navigate('/notifications'); handleMenuClose(); }} sx={{ py: 1.2, fontSize: '14px' }}>Notifications</MenuItem>
-						<MenuItem onClick={() => { navigate('/messages'); handleMenuClose(); }} sx={{ py: 1.2, fontSize: '14px' }}>Messages</MenuItem>
+						<Box sx={{ py: 1 }}>
+							<MenuItem onClick={() => { navigate('/notifications'); handleMenuClose(); }} sx={{ py: 1.5, px: 2.5, fontSize: '14px', fontWeight: 500 }}>Notifications</MenuItem>
+						</Box>
 						<Divider />
-						<MenuItem onClick={() => { navigate('/settings'); handleMenuClose(); }} sx={{ py: 1.2, fontSize: '14px' }}>Account settings</MenuItem>
-						<MenuItem onClick={() => { navigate('/payment-methods'); handleMenuClose(); }} sx={{ py: 1.2, fontSize: '14px' }}>Payment methods</MenuItem>
+						<Box sx={{ py: 1 }}>
+							<MenuItem onClick={() => { navigate('/settings'); handleMenuClose(); }} sx={{ py: 1.5, px: 2.5, fontSize: '14px', fontWeight: 500 }}>Account settings</MenuItem>
+						</Box>
 						<Divider />
-						{(user?.role === 'admin' || user?.role === 'manager' || user?.role === 'teacher') && (
-							<MenuItem onClick={() => { navigate('/dashboard'); handleMenuClose(); }} sx={{ py: 1.2, color: designTokens.colors.primary, fontWeight: 700, fontSize: '14px' }}>
-								Instructor Dashboard
-							</MenuItem>
-						)}
-						<MenuItem onClick={handleLogoutClick} sx={{ py: 1.2, fontWeight: 700, color: designTokens.colors.primary, fontSize: '14px' }}>Log out</MenuItem>
+						<Box sx={{ py: 1 }}>
+							<MenuItem onClick={handleLogoutClick} sx={{ py: 1.5, px: 2.5, fontWeight: 700, color: '#dc2626', fontSize: '14px' }}>Log out</MenuItem>
+						</Box>
 					</Menu>
-				</Box>
-			</Toolbar>
+				</Toolbar>
+			</Container>
 		</AppBar>
 	);
 };
