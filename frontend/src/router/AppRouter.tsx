@@ -2,14 +2,12 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
-import AdminLayout from '../layouts/AdminLayout';
-import StudentLayout from '../layouts/StudentLayout';
-import TeacherLayout from '../layouts/TeacherLayout';
+import AppShell from '../layouts/AppShell';
 import PublicLayout from '../layouts/PublicLayout';
 
 // Auth & Guards
 import ProtectedRoute from './ProtectedRoute';
-import RoleRoute from './RoleRoute';
+import RoleGuard from './RoleGuard';
 
 // Pages
 import Home from '../pages/Home';
@@ -19,20 +17,31 @@ import CourseDetail from '../pages/CourseDetail';
 import CoursePlayer from '../pages/CoursePlayer';
 import AdminGroups from '../pages/admin/AdminGroups';
 import AdminEnrollments from '../pages/admin/AdminEnrollments';
+import AdminUsers from '../pages/admin/AdminUsers';
 import AdminCourseCreate from '../pages/AdminCourseCreate';
 import AdminCourseEdit from '../pages/AdminCourseEdit';
 
-// Dashboards
-import StudentDashboard from '../pages/student/DashboardPage';
-import TeacherDashboard from '../pages/teacher/DashboardPage';
+// Unified Dashboard
+import Dashboard from '../pages/dashboard/Dashboard';
+
+// Catalog & Learning
+import CourseCatalog from '../pages/catalog/CourseCatalog';
+import MyLearning from '../pages/learning/MyLearning';
+
+// Shared / Scaffolded Pages
+import Reports from '../pages/Reports';
+import Certificates from '../pages/Certificates';
+import Notifications from '../pages/Notifications';
+import Settings from '../pages/Settings';
+import Profile from '../pages/Profile';
+
+// Dashboards (Legacy routing targets to be migrated or deleted)
 import TeacherCoursesPage from '../pages/teacher/CoursesPage';
 import CourseBuilderPage from '../pages/teacher/CourseBuilderPage';
-import AdminDashboard from '../pages/admin/DashboardPage';
 
 const AppRouter: React.FC = () => {
   return (
     <Routes>
-      {/* Public Routes - No Layout required for login/register usually or using PublicLayout later */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       
@@ -41,41 +50,60 @@ const AppRouter: React.FC = () => {
         <Route path="/courses/:coursePublicId" element={<CourseDetail />} />
       </Route>
 
-      {/* Authenticated Routes */}
+      {/* Authenticated Routes with Unified AppShell */}
       <Route element={<ProtectedRoute />}>
-        
-        {/* Student Portal */}
-        <Route path="/student" element={<StudentLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<StudentDashboard />} />
-          <Route path="learn/:coursePublicId" element={<CoursePlayer />} />
-          <Route path="learn/:coursePublicId/:lessonPublicId" element={<CoursePlayer />} />
-        </Route>
+        <Route element={<AppShell />}>
+          
+          {/* Unified Role-Adaptive Dashboard */}
+          <Route path="/dashboard" element={<Dashboard />} />
 
-        <Route element={<RoleRoute allowedRoles={['instructor', 'admin']} />}>
-          <Route path="/teacher" element={<TeacherLayout />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<TeacherDashboard />} />
-            <Route path="courses" element={<TeacherCoursesPage />} />
-            <Route path="courses/:coursePublicId/build" element={<CourseBuilderPage />} />
+          {/* Catalog & Learning */}
+          <Route path="/catalog" element={<CourseCatalog />} />
+          <Route path="/my-learning" element={<MyLearning />} />
+
+          {/* Shared Scaffolded Pages */}
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/certificates" element={<Certificates />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/profile" element={<Profile />} />
+
+          {/* Student Portal (user) */}
+          <Route element={<RoleGuard allowedRoles={['user', 'admin']} />}>
+            <Route path="/student">
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Navigate to="/dashboard" replace />} />
+              <Route path="learn/:coursePublicId" element={<CoursePlayer />} />
+              <Route path="learn/:coursePublicId/:lessonPublicId" element={<CoursePlayer />} />
+            </Route>
           </Route>
-        </Route>
 
-        {/* Admin Portal (Admin Only) */}
-        <Route element={<RoleRoute allowedRoles={['admin']} />}>
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="groups" element={<AdminGroups />} />
-            <Route path="enrollments" element={<AdminEnrollments />} />
-            <Route path="courses/create" element={<AdminCourseCreate />} />
-            <Route path="courses/:courseId/edit" element={<AdminCourseEdit />} />
+          {/* Teacher Portal */}
+          <Route element={<RoleGuard allowedRoles={['teacher', 'admin']} />}>
+            <Route path="/teacher">
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Navigate to="/dashboard" replace />} />
+              <Route path="courses" element={<TeacherCoursesPage />} />
+              <Route path="courses/:coursePublicId/build" element={<CourseBuilderPage />} />
+            </Route>
           </Route>
-        </Route>
 
+          {/* Admin Portal */}
+          <Route element={<RoleGuard allowedRoles={['admin', 'manager']} />}>
+            <Route path="/admin">
+              <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route path="dashboard" element={<Navigate to="/dashboard" replace />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="groups" element={<AdminGroups />} />
+              <Route path="enrollments" element={<AdminEnrollments />} />
+              <Route path="courses/create" element={<AdminCourseCreate />} />
+              <Route path="courses/:courseId/edit" element={<AdminCourseEdit />} />
+            </Route>
+          </Route>
+          
+        </Route>
       </Route>
 
-      {/* Catch-all redirects to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

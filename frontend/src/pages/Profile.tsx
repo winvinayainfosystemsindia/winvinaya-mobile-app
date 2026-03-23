@@ -1,0 +1,24 @@
+import React from 'react';
+import { Box, Typography, Paper } from '@mui/material';
+import { User } from 'lucide-react';
+
+const Profile: React.FC = () => {
+  return (
+    <Box sx={{ p: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
+          My Profile
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Manage your personal details and account preferences.
+        </Typography>
+      </Box>
+      <Paper sx={{ p: 8, textAlign: 'center', borderRadius: 3, border: '1px dashed #d1d7dc', boxShadow: 'none' }}>
+        <User size={48} color="#cbd5e1" style={{ marginBottom: 16 }} />
+        <Typography variant="h6" color="text.secondary">Profile Editor Coming Soon</Typography>
+      </Paper>
+    </Box>
+  );
+};
+
+export default Profile;

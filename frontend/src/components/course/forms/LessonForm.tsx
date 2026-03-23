@@ -4,6 +4,7 @@ import { Movie, CloudUpload } from '@mui/icons-material';
 import type { Lesson } from '../../../models/course';
 import type { Quiz } from '../../../services/contentService';
 import QuizEditor from '../../quiz/QuizEditor';
+import { designTokens } from '../../../theme/designTokens';
 
 interface LessonFormProps {
   open: boolean;
@@ -37,77 +38,98 @@ const LessonForm: React.FC<LessonFormProps> = ({
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle>{lesson?.id ? 'Edit Lesson' : 'New Lesson'}</DialogTitle>
-      <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
-        <TextField 
-          fullWidth 
-          label="Lesson Title" 
-          value={lesson?.title || ''} 
-          onChange={e => onChangeLesson({ title: e.target.value })} 
-          disabled={saving || uploading}
-        />
-        <TextField 
-          select 
-          fullWidth 
-          label="Content Type" 
-          value={lesson?.content_type || 'video'} 
-          onChange={e => onChangeLesson({ content_type: e.target.value as any })}
-          disabled={saving || uploading}
-        >
-          <MenuItem value="video">Video</MenuItem>
-          <MenuItem value="text">Text / Article</MenuItem>
-          <MenuItem value="quiz">Quiz</MenuItem>
-        </TextField>
-
-        {lesson?.content_type === 'text' && (
+      <DialogContent sx={{ p: 0 }}>
+        <Box sx={{ p: 3, borderBottom: `1px solid ${designTokens.colors.border}`, display: 'flex', flexDirection: 'column', gap: 2.5, bgcolor: '#fcfcfc' }}>
           <TextField 
             fullWidth 
-            multiline 
-            rows={8} 
-            label="Text Content" 
-            value={lesson?.text_content || ''} 
-            onChange={e => onChangeLesson({ text_content: e.target.value })} 
-            disabled={saving}
+            autoFocus
+            label="Lesson Title" 
+            placeholder="e.g. Introduction to React"
+            value={lesson?.title || ''} 
+            onChange={e => onChangeLesson({ title: e.target.value })} 
+            disabled={saving || uploading}
+            error={!lesson?.title?.trim() && !!lesson}
+            helperText={!lesson?.title?.trim() ? "Lesson title is required to enable saving" : ""}
           />
-        )}
+          <TextField 
+            select 
+            fullWidth 
+            label="Content Type" 
+            value={lesson?.content_type || 'video'} 
+            onChange={e => {
+              const newType = e.target.value as any;
+              onChangeLesson({ content_type: newType });
+              if (newType === 'quiz' && !quiz) {
+                onChangeQuiz({
+                  id: 0,
+                  lesson_id: lesson?.id || 0,
+                  title: lesson?.title || '',
+                  pass_score: 80,
+                  max_attempts: 3,
+                  questions: []
+                });
+              }
+            }}
+            disabled={saving || uploading}
+          >
+            <MenuItem value="video">Video</MenuItem>
+            <MenuItem value="text">Text / Article</MenuItem>
+            <MenuItem value="quiz">Quiz</MenuItem>
+          </TextField>
+        </Box>
 
-        {lesson?.content_type === 'quiz' && (
-          <QuizEditor quiz={quiz} loading={false} onChange={onChangeQuiz} />
-        )}
+        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', gap: 3 }}>
+          {lesson?.content_type === 'text' && (
+            <TextField 
+              fullWidth 
+              multiline 
+              rows={8} 
+              label="Text Content" 
+              value={lesson?.text_content || ''} 
+              onChange={e => onChangeLesson({ text_content: e.target.value })} 
+              disabled={saving}
+            />
+          )}
 
-        {lesson?.content_type === 'video' && (
-          <Box sx={{ border: '2px dashed #d1d7dc', p: 4, textAlign: 'center', borderRadius: 2, bgcolor: '#f7f9fa' }}>
-            <input type="file" accept="video/*" style={{ display: 'none' }} id="video-upload-input" onChange={handleFileChange} />
-            <label htmlFor="video-upload-input">
-              <Button variant="outlined" component="span" startIcon={<Movie />} disabled={uploading}>
-                {selectedFile ? 'Change File' : 'Choose Video File'}
-              </Button>
-            </label>
-            {selectedFile && (
-               <Box sx={{ mt: 2 }}>
-                 <Typography variant="body2" sx={{ mb: 1, fontWeight: 700 }}>{selectedFile.name}</Typography>
-                 <Button 
-                   variant="contained" 
-                   size="small" 
-                   startIcon={<CloudUpload />} 
-                   onClick={checkVideoUpload} 
-                   disabled={uploading}
-                   sx={{ bgcolor: '#a435f0', '&:hover': { bgcolor: '#8710d8' } }}
-                 >
-                   {uploading ? 'Uploading...' : 'Upload Video'}
-                 </Button>
-               </Box>
-            )}
-            {uploading && (
-               <Box sx={{ mt: 2 }}>
-                 <LinearProgress variant="determinate" value={uploadProgress || 0} color="secondary" />
-                 <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>{uploadProgress}%</Typography>
-               </Box>
-            )}
-            {lesson.media_file_id && !selectedFile && !uploading && (
-              <Typography variant="body2" color="success.main" sx={{ mt: 2, fontWeight: 700 }}>✓ Video uploaded and attached</Typography>
-            )}
-          </Box>
-        )}
+          {lesson?.content_type === 'quiz' && (
+            <QuizEditor quiz={quiz} loading={false} onChange={onChangeQuiz} />
+          )}
+
+          {lesson?.content_type === 'video' && (
+            <Box sx={{ border: `2px dashed ${designTokens.colors.border}`, p: 4, textAlign: 'center', borderRadius: 2, bgcolor: designTokens.colors.surface }}>
+              <input type="file" accept="video/*" style={{ display: 'none' }} id="video-upload-input" onChange={handleFileChange} />
+              <label htmlFor="video-upload-input">
+                <Button variant="outlined" component="span" startIcon={<Movie />} disabled={uploading}>
+                  {selectedFile ? 'Change File' : 'Choose Video File'}
+                </Button>
+              </label>
+              {selectedFile && (
+                 <Box sx={{ mt: 2 }}>
+                   <Typography variant="body2" sx={{ mb: 1, fontWeight: 700 }}>{selectedFile.name}</Typography>
+                   <Button 
+                     variant="contained" 
+                     size="small" 
+                     startIcon={<CloudUpload />} 
+                     onClick={checkVideoUpload} 
+                     disabled={uploading}
+                     sx={{ bgcolor: '#a435f0', '&:hover': { bgcolor: '#8710d8' } }}
+                   >
+                     {uploading ? 'Uploading...' : 'Upload Video'}
+                   </Button>
+                 </Box>
+              )}
+              {uploading && (
+                 <Box sx={{ mt: 2 }}>
+                   <LinearProgress variant="determinate" value={uploadProgress || 0} color="secondary" />
+                   <Typography variant="caption" sx={{ mt: 1, display: 'block' }}>{uploadProgress}%</Typography>
+                 </Box>
+              )}
+              {lesson.media_file_id && !selectedFile && !uploading && (
+                <Typography variant="body2" color="success.main" sx={{ mt: 2, fontWeight: 700 }}>✓ Video uploaded and attached</Typography>
+              )}
+            </Box>
+          )}
+        </Box>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 3 }}>
         <Button onClick={onClose} disabled={saving || uploading}>Cancel</Button>

@@ -8,7 +8,10 @@ interface MatchEditorProps {
   onChange: (updatedQuestion: QuizQuestion) => void;
 }
 
+import { designTokens } from '../../../theme/designTokens';
+
 const MatchEditor: React.FC<MatchEditorProps> = ({ question, onChange }) => {
+  // ... (logic remains same)
   const handleAddPair = () => {
     const pairs = [...(question.matching_pairs || []), { id: Date.now(), source_text: '', target_text: '' }];
     onChange({ ...question, matching_pairs: pairs });
@@ -27,7 +30,7 @@ const MatchEditor: React.FC<MatchEditorProps> = ({ question, onChange }) => {
   };
 
   return (
-    <Box>
+    <Box sx={{ mt: 2, p: 2, bgcolor: designTokens.colors.surface, border: `1px solid ${designTokens.colors.border}`, borderRadius: 2 }}>
       <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1, fontWeight: 600 }}>Matching Pairs</Typography>
       {question.matching_pairs?.map((p, pIdx) => (
         <Box key={pIdx} sx={{ display: 'flex', gap: 1, mb: 1 }}>

@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import { type QuizQuestion } from '../../../models/content';
+import { designTokens } from '../../../theme/designTokens';
 
 interface MCQEditorProps {
   question: QuizQuestion;
@@ -48,7 +49,7 @@ const MCQEditor: React.FC<MCQEditorProps> = ({ question, onChange }) => {
   };
 
   return (
-    <Box sx={{ mt: 2, p: 2, bgcolor: '#fff', borderRadius: 1, border: '1px solid #e0e0e0' }}>
+    <Box sx={{ mt: 2, p: 2, bgcolor: designTokens.colors.surface, borderRadius: 2, border: `1px solid ${designTokens.colors.border}` }}>
       <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, mb: 2, display: 'block' }}>
         ANSWER CHOICES
       </Typography>

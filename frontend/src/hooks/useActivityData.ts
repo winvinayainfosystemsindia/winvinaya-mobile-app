@@ -39,7 +39,7 @@ export const useActivityData = (options: UseActivityDataOptions = {}) => {
 
     const isAdmin = useCallback(() => {
         if (!user) return false;
-        return user.role === 'admin' || user.role === 'Admin' || user.role === 'ADMIN';
+        return user.role === 'admin';
     }, [user]);
 
     const fetchData = useCallback(async (page: number = currentPage, size: number = pageSize) => {

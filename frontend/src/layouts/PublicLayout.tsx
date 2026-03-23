@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, useTheme, useMediaQuery, Drawer } from '@mui/material';
+import { Box, useTheme, useMediaQuery } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { useAppDispatch, useAppSelector } from '../store/hooks';

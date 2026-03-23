@@ -23,3 +23,5 @@ export interface CourseProgress {
   progress_percent: number;
   lesson_progress: LessonProgress[];
 }
+
+export type CourseProgressResponse = CourseProgress;

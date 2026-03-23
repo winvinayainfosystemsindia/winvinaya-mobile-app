@@ -22,7 +22,7 @@ const TeacherCoursesPage: React.FC = () => {
       try {
         setLoading(true);
         const data = await courseService.getCourses();
-        if (user && user.role === 'instructor') {
+        if (user && user.role === 'teacher') {
           setCourses(data.filter(c => Number(c.instructor_id) === Number(user.id)));
         } else {
           setCourses(data);

@@ -1,260 +1,462 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-	Container,
-	Box,
-	Typography,
-	Button,
-	Grid,
-	Paper,
-	Tabs,
-	Tab,
-	Stack,
-	CircularProgress
+  Box,
+  Container,
+  Typography,
+  Button,
+  Grid,
+  Chip,
+  Stack,
+  CircularProgress,
+  Avatar,
+  Paper,
 } from '@mui/material';
-import CourseCard from '../components/common/CourseCard';
+import { ArrowForward, Star, People, MenuBook, EmojiEvents } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import courseService from '../services/courseService';
-import type { Course } from '../models/course';
+import { useAppSelector, useAppDispatch } from '../store/hooks';
+import { fetchCourses } from '../store/slices/courseSlice';
+import CourseCard from '../components/common/CourseCard';
+import { designTokens } from '../theme/designTokens';
+
+const CATEGORIES = [
+  'Development', 'Business', 'Finance & Accounting', 'IT & Software',
+  'Office Productivity', 'Personal Development', 'Design', 'Marketing',
+  'Health & Fitness', 'Music', 'Teaching & Academics',
+];
+
+const STATS = [
+  { icon: <People sx={{ fontSize: 28, color: designTokens.colors.accent }} />, value: '10,000+', label: 'Students enrolled' },
+  { icon: <MenuBook sx={{ fontSize: 28, color: designTokens.colors.accent }} />, value: '500+', label: 'Courses available' },
+  { icon: <Star sx={{ fontSize: 28, color: designTokens.colors.accent }} />, value: '4.8', label: 'Average rating' },
+  { icon: <EmojiEvents sx={{ fontSize: 28, color: designTokens.colors.accent }} />, value: '98%', label: 'Completion rate' },
+];
+
+const TESTIMONIALS = [
+  {
+    name: 'Priya Sharma',
+    role: 'Software Developer',
+    avatar: 'P',
+    text: 'NammAcademy completely changed my career. The course quality is exceptional and the instructors are world-class.',
+    rating: 5,
+  },
+  {
+    name: 'Rahul Mehta',
+    role: 'Data Analyst',
+    avatar: 'R',
+    text: 'I learned more in 3 weeks here than in a year of self-study. The structured curriculum is exactly what I needed.',
+    rating: 5,
+  },
+  {
+    name: 'Divya Nair',
+    role: 'UX Designer',
+    avatar: 'D',
+    text: 'The design courses here are outstanding. Real projects, real feedback, real skills. Highly recommend!',
+    rating: 5,
+  },
+];
 
 const Home: React.FC = () => {
-	const navigate = useNavigate();
-	const [tabValue, setTabValue] = React.useState(0);
-	const [courses, setCourses] = useState<Course[]>([]);
-	const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [selectedCategory, setSelectedCategory] = useState('Development');
+  const { courses, loading } = useAppSelector((state) => state.courses);
 
-	useEffect(() => {
-		const fetchPublicCourses = async () => {
-			try {
-				setLoading(true);
-				const data = await courseService.getCourses();
-				// Optionally filter by published status if needed: data.filter(c => c.status === 'published')
-				setCourses(data);
-			} catch (err) {
-				console.error('Failed to load courses', err);
-			} finally {
-				setLoading(false);
-			}
-		};
-		fetchPublicCourses();
-	}, []);
+  useEffect(() => {
+    dispatch(fetchCourses());
+  }, [dispatch]);
 
-	const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
-		setTabValue(newValue);
-	};
+  const featuredCourses = courses.slice(0, 8);
 
-	return (
-		<Box sx={{ pb: 8 }}>
-			{/* Hero Section */}
-			<Box sx={{ position: 'relative', height: { xs: 300, md: 400 }, mb: 6 }}>
-				<Box
-					component="img"
-					src="/assets/images/hero.jpg"
-					sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-				/>
-				<Container maxWidth="lg" sx={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100%', display: 'flex', alignItems: 'center' }}>
-					<Paper
-						sx={{
-							p: 4,
-							maxWidth: 440,
-							borderRadius: 0,
-							boxShadow: '0 2px 4px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.08)',
-							display: { xs: 'none', sm: 'block' }
-						}}
-					>
-						<Typography variant="h4" sx={{ fontWeight: 800, mb: 1, fontFamily: 'serif' }}>
-							Learning that gets you
-						</Typography>
-						<Typography variant="body1" sx={{ mb: 0 }}>
-							Skills for your present (and your future). Get started with us.
-						</Typography>
-					</Paper>
-				</Container>
-			</Box>
+  return (
+    <Box sx={{ pb: 8 }}>
 
-			<Container maxWidth="lg">
-				{/* Broad selection section */}
-				<Box sx={{ mb: 8 }}>
-					<Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
-						A broad selection of courses
-					</Typography>
-					<Typography variant="h6" sx={{ fontWeight: 400, color: 'text.secondary', mb: 3 }}>
-						Choose from over 210,000 online video courses with new additions published every month
-					</Typography>
+      {/* ═══════════════ HERO SECTION ═══════════════ */}
+      <Box
+        sx={{
+          bgcolor: designTokens.colors.heroBg,
+          color: '#fff',
+          py: { xs: 8, md: 10 },
+          px: 2,
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0, left: 0, right: 0, bottom: 0,
+            background: 'linear-gradient(135deg, rgba(164,53,240,0.15) 0%, rgba(28,29,31,0) 60%)',
+            pointerEvents: 'none',
+          },
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container alignItems="center" spacing={4}>
+            <Grid size={{ xs: 12, md: 7 }}>
+              <Typography
+                variant="h1"
+                sx={{
+                  fontWeight: 800,
+                  fontSize: { xs: '32px', md: '48px' },
+                  lineHeight: 1.15,
+                  mb: 2,
+                  color: '#fff',
+                }}
+              >
+                Learn without limits.
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontSize: { xs: '16px', md: '18px' },
+                  color: 'rgba(255,255,255,0.80)',
+                  mb: 4,
+                  maxWidth: 520,
+                  lineHeight: 1.7,
+                }}
+              >
+                Discover skills for your career, taught by real-world experts. Start learning today and join 10,000+ students building their future.
+              </Typography>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={() => navigate('/catalog')}
+                  endIcon={<ArrowForward />}
+                  sx={{
+                    bgcolor: designTokens.colors.primary,
+                    px: 4,
+                    py: 1.5,
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    '&:hover': { bgcolor: designTokens.colors.primaryDark },
+                  }}
+                >
+                  Explore Courses
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={() => navigate('/register')}
+                  sx={{
+                    borderColor: 'rgba(255,255,255,0.5)',
+                    color: '#fff',
+                    px: 4,
+                    py: 1.5,
+                    fontSize: '16px',
+                    '&:hover': {
+                      borderColor: '#fff',
+                      bgcolor: 'rgba(255,255,255,0.08)',
+                    },
+                  }}
+                >
+                  Join for Free
+                </Button>
+              </Stack>
+            </Grid>
 
-					<Tabs
-						value={tabValue}
-						onChange={handleTabChange}
-						textColor="inherit"
-						sx={{
-							mb: 4,
-							'& .MuiTab-root': {
-								fontWeight: 700,
-								minWidth: 0,
-								mr: 4,
-								px: 0,
-								fontSize: '1rem',
-								color: 'text.secondary',
-								textTransform: 'none',
-								'&.Mui-selected': { color: '#1c1d1f' }
-							},
-							'& .MuiTabs-indicator': { height: 2, bgcolor: '#1c1d1f' }
-						}}
-					>
-						<Tab label="Python" />
-						<Tab label="Excel" />
-						<Tab label="Web Development" />
-						<Tab label="JavaScript" />
-						<Tab label="Data Science" />
-						<Tab label="Amazon AWS" />
-						<Tab label="Drawing" />
-					</Tabs>
+            {/* Hero visual / illustration */}
+            <Grid size={{ xs: 12, md: 5 }} sx={{ display: { xs: 'none', md: 'flex' }, justifyContent: 'center' }}>
+              <Box
+                sx={{
+                  width: 320,
+                  height: 280,
+                  borderRadius: 4,
+                  bgcolor: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backdropFilter: 'blur(12px)',
+                  flexDirection: 'column',
+                  gap: 2,
+                }}
+              >
+                <EmojiEvents sx={{ fontSize: 60, color: designTokens.colors.accent }} />
+                <Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 20 }}>
+                  Start your journey
+                </Typography>
+                <Typography sx={{ color: 'rgba(255,255,255,0.6)', fontSize: 14, textAlign: 'center', px: 2 }}>
+                  500+ courses • Expert instructors • Certificates
+                </Typography>
+              </Box>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
 
-					<Paper sx={{ p: 4, borderRadius: 0, border: '1px solid #d1d7dc', boxShadow: 'none' }}>
-						<Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
-							Expand your career opportunities with Python
-						</Typography>
-						<Typography variant="body1" sx={{ mb: 3, maxWidth: 800 }}>
-							Take one of Udemy’s range of Python courses and learn how to code using this incredibly useful language. Its simple syntax and readability makes Python perfect for Flask, Django, data science, and financial analysis. Python skills can be applied almost anywhere.
-						</Typography>
-						<Button
-							variant="outlined"
-							sx={{
-								borderColor: '#1c1d1f',
-								color: '#1c1d1f',
-								fontWeight: 700,
-								borderRadius: 0,
-								mb: 4,
-								height: 40,
-								px: 2,
-								'&:hover': { bgcolor: 'rgba(28,29,31,0.04)', borderColor: '#1c1d1f' }
-							}}
-						>
-							Explore Python
-						</Button>
+      {/* ═══════════════ CATEGORY PILLS ═══════════════ */}
+      <Box sx={{ bgcolor: '#fff', borderBottom: `1px solid ${designTokens.colors.border}`, py: 2 }}>
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 1,
+              overflowX: 'auto',
+              pb: 0.5,
+              '&::-webkit-scrollbar': { height: 4 },
+              '&::-webkit-scrollbar-thumb': { bgcolor: '#d1d7dc', borderRadius: 2 },
+            }}
+          >
+            {CATEGORIES.map((cat) => (
+              <Chip
+                key={cat}
+                label={cat}
+                onClick={() => setSelectedCategory(cat)}
+                variant={selectedCategory === cat ? 'filled' : 'outlined'}
+                sx={{
+                  flexShrink: 0,
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  bgcolor: selectedCategory === cat ? designTokens.colors.primary : 'transparent',
+                  color: selectedCategory === cat ? '#fff' : designTokens.colors.textPrimary,
+                  borderColor: selectedCategory === cat ? designTokens.colors.primary : designTokens.colors.border,
+                  '&:hover': {
+                    bgcolor: selectedCategory === cat ? designTokens.colors.primaryDark : designTokens.colors.primaryLight,
+                  },
+                }}
+              />
+            ))}
+          </Box>
+        </Container>
+      </Box>
 
-						{loading ? (
-							<Box sx={{ py: 4, display: 'flex', justifyContent: 'center', width: '100%' }}>
-								<CircularProgress />
-							</Box>
-						) : courses.length === 0 ? (
-							<Typography variant="body1" sx={{ py: 4 }}>No courses available yet.</Typography>
-						) : (
-							<Grid container spacing={2}>
-								{courses.map((course) => (
-									<Grid size={{ xs: 12, sm: 6, md: 3 }} key={course.id}>
-										<CourseCard
-											title={course.title}
-											instructor={'WinVinaya Faculty'}
-											thumbnail={course.thumbnail_url || 'https://via.placeholder.com/240x135?text=Course'}
-											rating={course.rating_avg || 4.5}
-											reviewsCount={course.rating_count || 0}
-											price={course.price}
-											originalPrice={course.price ? course.price + 1000 : undefined}
-											category={course.category}
-											bestSeller={false}
-											onClick={() => navigate(`/courses/${course.public_id}`)}
-										/>
-									</Grid>
-								))}
-							</Grid>
-						)}
-					</Paper>
-				</Box>
+      <Container maxWidth="lg" sx={{ mt: 8 }}>
 
-				{/* Categories */}
-				<Box sx={{ mb: 8 }}>
-					<Typography variant="h5" sx={{ fontWeight: 800, mb: 3 }}>
-						Top categories
-					</Typography>
-					<Grid container spacing={3}>
-						{['Design', 'Development', 'Marketing', 'IT and Software', 'Personal Development', 'Business', 'Photography', 'Music'].map((cat) => (
-							<Grid size={{ xs: 12, sm: 6, md: 3 }} key={cat}>
-								<Paper
-									elevation={0}
-									sx={{
-										p: 0,
-										cursor: 'pointer',
-										'&:hover img': { transform: 'scale(1.05)' },
-										overflow: 'hidden'
-									}}
-								>
-									<Box sx={{ width: '100%', aspectRatio: '1/1', bgcolor: '#f7f9fa', mb: 1, overflow: 'hidden' }}>
-										<Box
-											component="img"
-											src={`https://s.udemycdn.com/home/top-categories/lohp-category-${cat.toLowerCase().replace(/ /g, '-')}-v2.jpg`}
-											sx={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s ease' }}
-										/>
-									</Box>
-									<Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{cat}</Typography>
-								</Paper>
-							</Grid>
-						))}
-					</Grid>
-				</Box>
+        {/* ═══════════════ FEATURED COURSES ═══════════════ */}
+        <Box sx={{ mb: 8 }}>
+          <Box sx={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', mb: 3 }}>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 800, mb: 0.5 }}>
+                Most Popular Courses
+              </Typography>
+              <Typography color="text.secondary">
+                Top-rated courses trusted by thousands of students
+              </Typography>
+            </Box>
+            <Button
+              variant="text"
+              onClick={() => navigate('/catalog')}
+              endIcon={<ArrowForward />}
+              sx={{ fontWeight: 700, color: designTokens.colors.primary, whiteSpace: 'nowrap' }}
+            >
+              Browse all
+            </Button>
+          </Box>
 
-				{/* Bottom CTA */}
-				<Box sx={{ py: 8, textAlign: 'center', bgcolor: '#f7f9fa', mx: -20, px: 20 }}>
-					<Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
-						Become an instructor
-					</Typography>
-					<Typography variant="body1" sx={{ mb: 3 }}>
-						Instructors from around the world teach millions of students on WinVinaya. We provide the tools and skills to teach what you love.
-					</Typography>
-					<Button
-						variant="contained"
-						size="large"
-						sx={{ height: 48, px: 4, fontWeight: 700 }}
-						onClick={() => navigate('/register')}
-					>
-						Start teaching today
-					</Button>
-				</Box>
-			</Container>
+          {loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+              <CircularProgress color="primary" />
+            </Box>
+          ) : (
+            <Grid container spacing={3}>
+              {featuredCourses.length === 0 ? (
+                <Grid size={{ xs: 12 }}>
+                  <Box sx={{ py: 8, textAlign: 'center', color: 'text.secondary' }}>
+                    <MenuBook sx={{ fontSize: 48, mb: 2, opacity: 0.3 }} />
+                    <Typography variant="h6">No courses available yet</Typography>
+                  </Box>
+                </Grid>
+              ) : (
+                featuredCourses.map((course: any) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={course.id}>
+                    <CourseCard
+                      title={course.title}
+                      instructor="WinVinaya Faculty"
+                      thumbnail={course.thumbnail_url || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=225&fit=crop'}
+                      rating={course.rating_avg || 4.5}
+                      reviewsCount={course.rating_count || 0}
+                      category={course.category}
+                      bestSeller={false}
+                      onClick={() => navigate(`/courses/${course.public_id}`)}
+                    />
+                  </Grid>
+                ))
+              )}
+            </Grid>
+          )}
+        </Box>
 
-			{/* Footer Placeholder matching Udemy */}
-			<Box sx={{ bgcolor: '#1c1d1f', color: '#ffffff', pt: 8, pb: 4, mt: 0 }}>
-				<Container maxWidth="lg">
-					<Grid container spacing={4} sx={{ mb: 8 }}>
-						<Grid size={{ xs: 6, md: 3 }}>
-							<Stack spacing={1}>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>WinVinaya Business</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Teach on WinVinaya</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Get the app</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>About us</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Contact us</Typography>
-							</Stack>
-						</Grid>
-						<Grid size={{ xs: 6, md: 3 }}>
-							<Stack spacing={1}>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Careers</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Blog</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Help and Support</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Affiliate</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Investors</Typography>
-							</Stack>
-						</Grid>
-						<Grid size={{ xs: 6, md: 3 }}>
-							<Stack spacing={1}>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Terms</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Privacy policy</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Cookie settings</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Sitemap</Typography>
-								<Typography variant="body2" sx={{ cursor: 'pointer', '&:hover': { textDecoration: 'underline' } }}>Accessibility statement</Typography>
-							</Stack>
-						</Grid>
-					</Grid>
-					<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-						<Typography variant="h6" sx={{ fontWeight: 800, letterSpacing: -1 }}>
-							WinVinaya
-						</Typography>
-						<Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-							© 2024 WinVinaya, Inc.
-						</Typography>
-					</Box>
-				</Container>
-			</Box>
-		</Box>
-	);
+        {/* ═══════════════ STATS BANNER ═══════════════ */}
+        <Paper
+          elevation={0}
+          sx={{
+            mb: 8,
+            p: { xs: 3, md: 5 },
+            borderRadius: 3,
+            border: `1px solid ${designTokens.colors.border}`,
+            background: `linear-gradient(135deg, ${designTokens.colors.primaryLight} 0%, #fff 100%)`,
+          }}
+        >
+          <Grid container spacing={3} justifyContent="center">
+            {STATS.map((stat) => (
+              <Grid size={{ xs: 6, md: 3 }} key={stat.label} sx={{ textAlign: 'center' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                  {stat.icon}
+                  <Typography sx={{ fontSize: '28px', fontWeight: 800, color: designTokens.colors.dark }}>
+                    {stat.value}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">{stat.label}</Typography>
+                </Box>
+              </Grid>
+            ))}
+          </Grid>
+        </Paper>
+
+        {/* ═══════════════ TESTIMONIALS ═══════════════ */}
+        <Box sx={{ mb: 8 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, mb: 1 }}>
+            What our students say
+          </Typography>
+          <Typography color="text.secondary" sx={{ mb: 4 }}>
+            Real stories from real learners who transformed their careers
+          </Typography>
+          <Grid container spacing={3}>
+            {TESTIMONIALS.map((t) => (
+              <Grid size={{ xs: 12, md: 4 }} key={t.name}>
+                <Paper
+                  elevation={0}
+                  sx={{
+                    p: 3,
+                    height: '100%',
+                    border: `1px solid ${designTokens.colors.border}`,
+                    borderRadius: 3,
+                    transition: 'box-shadow 0.2s, transform 0.2s',
+                    '&:hover': {
+                      boxShadow: designTokens.shadows.cardHover,
+                      transform: 'translateY(-4px)',
+                    },
+                  }}
+                >
+                  {/* Stars */}
+                  <Stack direction="row" sx={{ mb: 1.5 }}>
+                    {[...Array(t.rating)].map((_, i) => (
+                      <Star key={i} sx={{ fontSize: 16, color: designTokens.colors.accent }} />
+                    ))}
+                  </Stack>
+                  <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.7, fontStyle: 'italic', color: '#4a4a4a' }}>
+                    "{t.text}"
+                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Avatar sx={{ bgcolor: designTokens.colors.primary, width: 36, height: 36, fontSize: '14px', fontWeight: 700 }}>
+                      {t.avatar}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{t.name}</Typography>
+                      <Typography variant="caption" color="text.secondary">{t.role}</Typography>
+                    </Box>
+                  </Box>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+
+        {/* ═══════════════ CTA STRIP ═══════════════ */}
+        <Box
+          sx={{
+            bgcolor: designTokens.colors.dark,
+            color: '#fff',
+            borderRadius: 3,
+            p: { xs: 4, md: 6 },
+            textAlign: 'center',
+            mb: 4,
+            position: 'relative',
+            overflow: 'hidden',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(135deg, rgba(164,53,240,0.2) 0%, transparent 60%)',
+              pointerEvents: 'none',
+            },
+          }}
+        >
+          <Typography variant="h3" sx={{ fontWeight: 800, color: '#fff', mb: 1.5 }}>
+            Ready to start learning?
+          </Typography>
+          <Typography sx={{ color: 'rgba(255,255,255,0.75)', mb: 3, fontSize: 16 }}>
+            Join thousands of students and take the first step toward your goals.
+          </Typography>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={() => navigate('/register')}
+            sx={{
+              bgcolor: designTokens.colors.primary,
+              px: 5,
+              py: 1.5,
+              fontSize: 16,
+              fontWeight: 700,
+              '&:hover': { bgcolor: designTokens.colors.primaryDark },
+            }}
+          >
+            Get Started — It's Free
+          </Button>
+        </Box>
+
+      </Container>
+
+      {/* ═══════════════ FOOTER ═══════════════ */}
+      <Box
+        component="footer"
+        sx={{
+          bgcolor: designTokens.colors.dark,
+          color: 'rgba(255,255,255,0.7)',
+          pt: 6,
+          pb: 3,
+          mt: 4,
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={4} sx={{ mb: 4 }}>
+            <Grid size={{ xs: 12, md: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1.5 }}>
+                <MenuBook sx={{ color: designTokens.colors.primary, fontSize: 22 }} />
+                <Typography sx={{ fontWeight: 800, color: '#fff', fontSize: 16 }}>
+                  Namm<span style={{ color: designTokens.colors.primary }}>Academy</span>
+                </Typography>
+              </Box>
+              <Typography variant="caption">
+                Empowering learners worldwide with quality education.
+              </Typography>
+            </Grid>
+            {[
+              { title: 'Platform', links: ['Browse Courses', 'Become Instructor', 'Enterprise', 'Blog'] },
+              { title: 'Support', links: ['Help Centre', 'Contact Us', 'Terms of Use', 'Privacy Policy'] },
+              { title: 'Company', links: ['About Us', 'Careers', 'Press', 'Affiliates'] },
+            ].map((col) => (
+              <Grid size={{ xs: 6, md: 3 }} key={col.title}>
+                <Typography sx={{ color: '#fff', fontWeight: 700, mb: 1.5, fontSize: 14 }}>
+                  {col.title}
+                </Typography>
+                {col.links.map((link) => (
+                  <Typography
+                    key={link}
+                    variant="caption"
+                    display="block"
+                    sx={{
+                      mb: 0.75,
+                      cursor: 'pointer',
+                      '&:hover': { color: '#fff' },
+                      transition: 'color 0.15s',
+                    }}
+                  >
+                    {link}
+                  </Typography>
+                ))}
+              </Grid>
+            ))}
+          </Grid>
+          <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', pt: 3, textAlign: 'center' }}>
+            <Typography variant="caption">
+              © {new Date().getFullYear()} WinVinaya Infosystems India. All rights reserved.
+            </Typography>
+          </Box>
+        </Container>
+      </Box>
+
+    </Box>
+  );
 };
 
 export default Home;

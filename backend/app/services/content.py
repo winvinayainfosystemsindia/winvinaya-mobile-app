@@ -1,5 +1,7 @@
 from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 from app.models.content import Quiz, QuizQuestion, MatchingPair, QuizAttempt, QuizQuestionType
 from app.repositories.content import (
@@ -25,8 +27,8 @@ class QuizService:
                 await self.add_question(db, quiz.id, q_in)
 
         await db.commit()
-        await db.refresh(quiz)
-        return quiz
+        # Return re-fetched quiz with all relations loaded
+        return await quiz_repository.get(db, quiz.id)
 
     async def add_question(self, db: AsyncSession, quiz_id: int, question_in: QuizQuestionCreate) -> QuizQuestion:
         # 1. Create Question
@@ -43,8 +45,13 @@ class QuizService:
                 db.add(pair)
         
         await db.commit()
-        await db.refresh(question)
-        return question
+        # Re-fetch to load matching_pairs if any
+        result = await db.execute(
+            select(QuizQuestion)
+            .where(QuizQuestion.id == question.id)
+            .options(selectinload(QuizQuestion.matching_pairs))
+        )
+        return result.scalars().first()
 
     async def submit_attempt(self, db: AsyncSession, user_id: int, attempt_in: QuizAttemptCreate) -> QuizAttempt:
         quiz = await quiz_repository.get(db, attempt_in.quiz_id)
@@ -80,7 +87,6 @@ class QuizService:
 
         await db.commit()
         await db.refresh(attempt)
-        print(f"DEBUG SERVICE: Returning attempt of type={type(attempt)} for quiz_id={attempt.quiz_id}")
         return attempt
 
     async def update_quiz(self, db: AsyncSession, quiz_id: int, quiz_in: QuizUpdate) -> Quiz:
@@ -106,7 +112,7 @@ class QuizService:
                 await self.add_question(db, quiz_id, q_create)
 
         await db.commit()
-        await db.refresh(quiz)
-        return quiz
+        # Return re-fetched quiz with all relations loaded
+        return await quiz_repository.get(db, quiz_id)
 
 quiz_service = QuizService()

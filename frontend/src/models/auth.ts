@@ -1,3 +1,5 @@
+export type UserRole = 'admin' | 'manager' | 'teacher' | 'user' | 'guest';
+
 export interface User {
 	id: number;
 	public_id: string;
@@ -7,7 +9,7 @@ export interface User {
 	is_active: boolean;
 	is_verified: boolean;
 	is_superuser?: boolean;
-	role: string;
+	role: UserRole;
 	created_at: string;
 	updated_at: string;
 }

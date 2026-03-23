@@ -12,17 +12,12 @@ import {
   ListItem,
   ListItemText,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   CircularProgress,
   Tabs,
   Tab,
   MenuItem,
   Alert,
   Snackbar,
-  LinearProgress,
 } from '@mui/material';
 import {
   Add,
@@ -31,12 +26,12 @@ import {
   ArrowBack,
   Movie,
   Description,
-  CloudUpload,
   QuizOutlined,
 } from '@mui/icons-material';
 import { courseService, type Course, type Module, type Lesson } from '../services/courseService';
 import contentService, { type Quiz } from '../services/contentService';
-import QuizEditor from '../components/quiz/QuizEditor';
+import LessonForm from '../components/course/forms/LessonForm';
+import ModuleForm from '../components/course/forms/ModuleForm';
 
 const AdminCourseEdit: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -55,13 +50,11 @@ const AdminCourseEdit: React.FC = () => {
   const [lessonDialogOpen, setLessonDialogOpen] = useState(false);
 
   // Video Upload States
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   // Quiz Edit States
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
-  const [quizLoading, setQuizLoading] = useState(false);
 
   useEffect(() => {
     const fetchCourse = async () => {
@@ -110,7 +103,7 @@ const AdminCourseEdit: React.FC = () => {
       } else {
         const newModule = await courseService.addModule(course.id!, {
           title: editingModule.title,
-          order: editingModule.order
+          order: course.modules.length
         });
         setCourse(prev => prev ? { ...prev, modules: [...prev.modules, newModule] } : null);
       }
@@ -129,7 +122,6 @@ const AdminCourseEdit: React.FC = () => {
     setLessonDialogOpen(true);
 
     if (lesson.content_type === 'quiz' && lesson.id) {
-      setQuizLoading(true);
       try {
         const quiz = await contentService.getQuizByLesson(lesson.id);
         setEditingQuiz(quiz);
@@ -142,8 +134,6 @@ const AdminCourseEdit: React.FC = () => {
           max_attempts: 3,
           questions: []
         });
-      } finally {
-        setQuizLoading(false);
       }
     } else {
       setEditingQuiz(null);
@@ -179,7 +169,6 @@ const AdminCourseEdit: React.FC = () => {
         } : null);
       }
 
-      // Save Quiz if applicable
       if (savedLesson.content_type === 'quiz' && editingQuiz) {
         await contentService.saveQuiz(savedLesson.id!, editingQuiz);
       }
@@ -193,14 +182,8 @@ const AdminCourseEdit: React.FC = () => {
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
-    }
-  };
-
-  const handleVideoUpload = async () => {
-    if (!selectedFile || !editingLesson || !editingModule || !course) return;
+  const handleVideoUpload = async (file: File) => {
+    if (!editingLesson || !editingModule || !course) return;
     setUploading(true);
     setUploadProgress(0);
     try {
@@ -213,6 +196,7 @@ const AdminCourseEdit: React.FC = () => {
         });
         lessonId = newLesson.id;
         setEditingLesson(newLesson);
+        // Refresh structure
         const updatedCourse = await courseService.getCourseStructure(course.id!);
         setCourse(updatedCourse);
       }
@@ -221,13 +205,12 @@ const AdminCourseEdit: React.FC = () => {
         course.id!,
         editingModule.id!,
         lessonId!,
-        selectedFile,
+        file,
         (progress) => setUploadProgress(progress)
       );
 
       setEditingLesson(prev => prev ? { ...prev, media_file_id: media.id } : null);
       setSnackbar({ open: true, message: 'Video uploaded successfully!', severity: 'success' });
-      setSelectedFile(null);
     } catch (error) {
       console.error('Video upload failed:', error);
       setSnackbar({ open: true, message: 'Video upload failed', severity: 'error' });
@@ -238,7 +221,7 @@ const AdminCourseEdit: React.FC = () => {
   };
 
   if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', p: 8 }}><CircularProgress /></Box>;
-  if (!course) return <Typography>Course not found</Typography>;
+  if (!course) return <Typography sx={{ p: 4 }}>Course not found</Typography>;
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -274,7 +257,9 @@ const AdminCourseEdit: React.FC = () => {
               </TextField>
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <Button variant="contained" size="large" startIcon={<Save />} loading={saving} onClick={handleUpdateCourse}>Save Course Info</Button>
+              <Button variant="contained" size="large" startIcon={<Save />} onClick={handleUpdateCourse} disabled={saving}>
+                {saving ? 'Saving...' : 'Save Course Info'}
+              </Button>
             </Grid>
           </Grid>
         </Paper>
@@ -313,64 +298,28 @@ const AdminCourseEdit: React.FC = () => {
         </Box>
       )}
 
-      {/* Module Dialog */}
-      <Dialog open={moduleDialogOpen} onClose={() => setModuleDialogOpen(false)} fullWidth maxWidth="xs">
-        <DialogTitle>{editingModule?.id ? 'Edit Module' : 'New Module'}</DialogTitle>
-        <DialogContent>
-          <TextField autoFocus fullWidth label="Module Title" sx={{ mt: 2 }} value={editingModule?.title || ''} onChange={e => setEditingModule(prev => prev ? { ...prev, title: e.target.value } : null)} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setModuleDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" loading={saving} onClick={handleSaveModule}>Save</Button>
-        </DialogActions>
-      </Dialog>
+      <ModuleForm
+        open={moduleDialogOpen}
+        onClose={() => setModuleDialogOpen(false)}
+        module={editingModule}
+        onChange={updates => setEditingModule(prev => prev ? { ...prev, ...updates } : null)}
+        onSave={handleSaveModule}
+        saving={saving}
+      />
 
-      {/* Lesson Dialog */}
-      <Dialog open={lessonDialogOpen} onClose={() => setLessonDialogOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>{editingLesson?.id ? 'Edit Lesson' : 'New Lesson'}</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 3, pt: 2 }}>
-          <TextField fullWidth label="Lesson Title" value={editingLesson?.title || ''} onChange={e => setEditingLesson(prev => prev ? { ...prev, title: e.target.value } : null)} />
-          <TextField select fullWidth label="Content Type" value={editingLesson?.content_type || 'video'} onChange={e => {
-            const newType = e.target.value as any;
-            setEditingLesson(prev => prev ? { ...prev, content_type: newType } : null);
-            if (newType === 'quiz' && !editingQuiz) {
-              setEditingQuiz({
-                id: 0,
-                lesson_id: editingLesson?.id || 0,
-                title: editingLesson?.title || '',
-                pass_score: 80,
-                max_attempts: 3,
-                questions: []
-              });
-            }
-          }}>
-            <MenuItem value="video">Video</MenuItem>
-            <MenuItem value="text">Text / Article</MenuItem>
-            <MenuItem value="quiz">Quiz</MenuItem>
-          </TextField>
-
-          {editingLesson?.content_type === 'text' && (
-            <TextField fullWidth multiline rows={8} label="Text Content" value={editingLesson?.text_content || ''} onChange={e => setEditingLesson(prev => prev ? { ...prev, text_content: e.target.value } : null)} />
-          )}
-
-          {editingLesson?.content_type === 'quiz' && (
-            <QuizEditor quiz={editingQuiz} loading={quizLoading} onChange={setEditingQuiz} />
-          )}
-
-          {editingLesson?.content_type === 'video' && (
-            <Box sx={{ border: '1px dashed #ccc', p: 2, textAlign: 'center', borderRadius: 1 }}>
-              <input type="file" accept="video/*" style={{ display: 'none' }} id="video-upload-input" onChange={handleFileChange} />
-              <label htmlFor="video-upload-input"><Button variant="outlined" component="span" startIcon={<Movie />} disabled={uploading}>{selectedFile ? 'Change' : 'Choose Video'}</Button></label>
-              {selectedFile && <Box sx={{ mt: 1 }}><Typography variant="caption" sx={{ display: 'block', mb: 1 }}>{selectedFile.name}</Typography><Button variant="contained" size="small" startIcon={<CloudUpload />} onClick={handleVideoUpload} disabled={uploading}>{uploading ? 'Uploading...' : 'Upload'}</Button></Box>}
-              {uploading && <Box sx={{ mt: 1 }}><LinearProgress variant="determinate" value={uploadProgress} /><Typography variant="caption">{uploadProgress}%</Typography></Box>}
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setLessonDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" loading={saving} onClick={handleSaveLesson}>Save</Button>
-        </DialogActions>
-      </Dialog>
+      <LessonForm
+        open={lessonDialogOpen}
+        onClose={() => setLessonDialogOpen(false)}
+        lesson={editingLesson}
+        quiz={editingQuiz}
+        onChangeLesson={updates => setEditingLesson(prev => prev ? { ...prev, ...updates } : null)}
+        onChangeQuiz={setEditingQuiz}
+        onSave={handleSaveLesson}
+        onUploadVideo={handleVideoUpload}
+        saving={saving}
+        uploading={uploading}
+        uploadProgress={uploadProgress}
+      />
 
       <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
         <Alert severity={snackbar.severity}>{snackbar.message}</Alert>

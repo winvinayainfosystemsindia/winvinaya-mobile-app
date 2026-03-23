@@ -7,9 +7,11 @@ interface TrueFalseEditorProps {
   onChange: (updatedQuestion: QuizQuestion) => void;
 }
 
+import { designTokens } from '../../../theme/designTokens';
+
 const TrueFalseEditor: React.FC<TrueFalseEditorProps> = ({ question, onChange }) => {
   return (
-    <Box sx={{ p: 2, bgcolor: '#fff', border: '1px solid #e0e0e0', borderRadius: 1 }}>
+    <Box sx={{ p: 2, bgcolor: designTokens.colors.surface, border: `1px solid ${designTokens.colors.border}`, borderRadius: 2 }}>
       <Typography variant="body2" sx={{ fontWeight: 600, mb: 1 }}>Correct Answer</Typography>
       <RadioGroup
         row
