@@ -10,6 +10,8 @@ import {
     Link
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Link as RouterLink } from 'react-router-dom';
+import { designTokens } from '../../../theme/designTokens';
 
 interface LoginFormProps {
     loading: boolean;
@@ -77,7 +79,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ loading, onLogin }) => {
                     variant="body2" 
                     sx={{ 
                         fontWeight: 600, 
-                        color: 'primary.main', 
+                        color: designTokens.colors.primary, 
                         textDecoration: 'none',
                         '&:hover': { textDecoration: 'underline' }
                     }}
@@ -97,8 +99,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ loading, onLogin }) => {
                     fontSize: '1rem',
                     textTransform: 'none',
                     borderRadius: '8px',
+                    bgcolor: designTokens.colors.primary,
                     boxShadow: '0 4px 12px rgba(164, 53, 240, 0.2)',
                     '&:hover': {
+                        bgcolor: designTokens.colors.primaryDark,
                         boxShadow: '0 6px 16px rgba(164, 53, 240, 0.3)',
                     }
                 }}
@@ -110,10 +114,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ loading, onLogin }) => {
                 <Typography variant="body2" color="text.secondary">
                     Don't have an account?{' '}
                     <Link 
-                        href="#" 
+                        component={RouterLink}
+                        to="/auth/register"
                         sx={{ 
                             fontWeight: 700, 
-                            color: 'primary.main', 
+                            color: designTokens.colors.primary, 
                             textDecoration: 'none',
                             '&:hover': { textDecoration: 'underline' }
                         }}

@@ -11,21 +11,26 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { loginUser, clearError } from '../store/slices/authSlice';
 
 // Modular Components
-import LoginHeader from '../components/auth/LoginHeader';
-import LoginForm from '../components/auth/LoginForm';
-import SocialAuth from '../components/auth/SocialAuth';
+import { 
+    LoginHeader, 
+    LoginForm, 
+    SocialAuth, 
+    AuthFooter 
+} from '../components/auth';
 
 const Login: React.FC = () => {
     const navigate = useNavigate();
     const toast = useToast();
     const dispatch = useAppDispatch();
-    const { loading, error, isAuthenticated, isInitialized } = useAppSelector((state) => state.auth);
+    const { loading, error } = useAppSelector((state) => state.auth);
 
+    /*
     useEffect(() => {
         if (isInitialized && isAuthenticated) {
             navigate('/dashboard');
         }
     }, [isAuthenticated, isInitialized, navigate]);
+    */
 
     useEffect(() => {
         if (error) {
@@ -39,6 +44,7 @@ const Login: React.FC = () => {
         try {
             await dispatch(loginUser({ email, password })).unwrap();
             toast.success('Login successful');
+            navigate('/dashboard');
         } catch (err) {
             console.error('Login failed', err);
         }
@@ -85,25 +91,7 @@ const Login: React.FC = () => {
                         />
                     </Paper>
                 </Fade>
-                
-                <Box sx={{ mt: 4, textAlign: 'center' }}>
-                    <Box 
-                        component="footer" 
-                        sx={{ 
-                            opacity: 0.6,
-                            transition: 'opacity 0.3s',
-                            '&:hover': { opacity: 1 }
-                        }}
-                    >
-                        <Box sx={{ color: 'text.secondary', fontSize: '0.8rem', fontWeight: 500 }}>
-                            © {new Date().getFullYear()} WinVinaya, Inc. • Professional Learning Platform
-                        </Box>
-                        <Box sx={{ mt: 1, display: 'flex', justifyContent: 'center', gap: 2 }}>
-                            <Box sx={{ color: 'text.secondary', fontSize: '0.75rem', cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>Privacy Policy</Box>
-                            <Box sx={{ color: 'text.secondary', fontSize: '0.75rem', cursor: 'pointer', '&:hover': { color: 'primary.main' } }}>Terms of Service</Box>
-                        </Box>
-                    </Box>
-                </Box>
+                <AuthFooter />
             </Container>
         </Box>
     );

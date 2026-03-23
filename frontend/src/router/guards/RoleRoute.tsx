@@ -10,7 +10,7 @@ const RoleRoute: React.FC<RoleRouteProps> = ({ allowedRoles }) => {
   const { user, isAuthenticated } = useAppSelector((state) => state.auth);
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/auth/login" replace />;
   }
 
   if (!user || !allowedRoles.includes(user.role)) {

@@ -7,8 +7,8 @@ import {
 } from '@mui/material';
 import {
     Google as GoogleIcon,
-    GitHub as GitHubIcon,
-    Facebook as FacebookIcon
+    LinkedIn as LinkedInIcon,
+    GitHub as GitHubIcon
 } from '@mui/icons-material';
 
 interface SocialAuthProps {
@@ -41,15 +41,15 @@ const SocialAuth: React.FC<SocialAuthProps> = ({ onSocialLogin }) => {
                 <Button
                     variant="outlined"
                     fullWidth
-                    onClick={() => onSocialLogin('facebook')}
+                    onClick={() => onSocialLogin('linkedin')}
                     sx={{
                         borderColor: '#d1d7dc',
-                        color: '#1877F2',
+                        color: '#0A66C2',
                         py: 1.5,
                         '&:hover': { borderColor: '#1c1d1f', bgcolor: 'rgba(28,29,31,0.04)' }
                     }}
                 >
-                    <FacebookIcon />
+                    <LinkedInIcon />
                 </Button>
                 <Button
                     variant="outlined"

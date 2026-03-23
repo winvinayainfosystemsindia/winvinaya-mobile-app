@@ -10,7 +10,7 @@ import TrendingKnowledge from '../components/home/TrendingKnowledge';
 import PersonalizedPath from '../components/home/PersonalizedPath';
 import Faculty from '../components/home/Faculty';
 import HomeCTA from '../components/home/HomeCTA';
-import HomeFooter from '../components/home/HomeFooter';
+import Footer from '../components/layout/Footer';
 
 const Home: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -27,7 +27,7 @@ const Home: React.FC = () => {
       <PersonalizedPath />
       <Faculty />
       <HomeCTA />
-      <HomeFooter />
+      <Footer />
     </Box>
   );
 };

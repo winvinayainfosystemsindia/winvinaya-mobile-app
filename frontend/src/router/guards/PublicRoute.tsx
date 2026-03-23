@@ -1,5 +1,5 @@
-import React from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '../../store/hooks';
 
 /**
@@ -7,16 +7,21 @@ import { useAppSelector } from '../../store/hooks';
  * Use this for pages like Login and Register.
  */
 const PublicRoute: React.FC = () => {
-  const { isAuthenticated, loading } = useAppSelector((state) => state.auth);
+  const { loading, isAuthenticated } = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Redirect only if specifically needed, but for now we follow user's request
+    // to allow staying on these pages even if authenticated.
+    /*
+    if (!loading && isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+    */
+  }, [isAuthenticated, loading, navigate]);
 
   if (loading) {
-    // Optionally return a loading spinner here
     return null;
-  }
-
-  if (isAuthenticated) {
-    // If user is already logged in, redirect them to the home page
-    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;

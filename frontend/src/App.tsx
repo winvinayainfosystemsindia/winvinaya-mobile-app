@@ -7,7 +7,7 @@ import { SnackbarProvider } from 'notistack';
 import { BrowserRouter as Router } from 'react-router-dom';
 import AppRouter from './router/AppRouter';
 import { AuthProvider } from './context/AuthContext';
-import AuthInitializer from './components/auth/AuthInitializer';
+import { AuthInitializer } from './components/auth';
 
 function App() {
   return (

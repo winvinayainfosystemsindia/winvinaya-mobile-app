@@ -17,7 +17,7 @@ const ProtectedRoute: React.FC = () => {
 
   if (!isAuthenticated) {
     // Redirect unauthenticated users to login page, but save the current location
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/auth/login" state={{ from: location }} replace />;
   }
 
   return <Outlet />;

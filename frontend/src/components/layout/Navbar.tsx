@@ -188,7 +188,7 @@ const Navbar: React.FC<NavbarProps> = ({
 					</Box>
 
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1.5 } }}>
-						{isAuthenticated ? (
+						{isAuthenticated && location.pathname !== '/' ? (
 							<>
 								<IconButton sx={{ color: designTokens.colors.textSecondary, display: { xs: 'none', md: 'flex' } }}>
 									<FavoriteBorderIcon fontSize="medium" />
@@ -231,7 +231,7 @@ const Navbar: React.FC<NavbarProps> = ({
 										fontSize: '14px',
 										'&:hover': { bgcolor: designTokens.colors.sidebarHover }
 									}}
-									onClick={() => navigate('/login')}
+									onClick={() => navigate('/auth/login')}
 								>
 									Log in
 								</Button>
@@ -249,7 +249,7 @@ const Navbar: React.FC<NavbarProps> = ({
 										boxShadow: 'none',
 										'&:hover': { bgcolor: designTokens.colors.primaryDark, boxShadow: 'none' }
 									}}
-									onClick={() => navigate('/register')}
+									onClick={() => navigate('/auth/register')}
 								>
 									Sign up
 								</Button>

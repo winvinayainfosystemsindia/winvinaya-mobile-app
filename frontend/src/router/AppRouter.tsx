@@ -10,6 +10,7 @@ import { logout } from '../store/slices/authSlice';
 // Pages
 import Home from '../pages/Home';
 import Login from '../pages/Login';
+import Register from '../pages/Register';
 
 // Catalog
 import CourseCatalog from '../pages/catalog/CourseCatalog';
@@ -18,9 +19,9 @@ import CourseCatalog from '../pages/catalog/CourseCatalog';
 import NotFound from '../pages/common/NotFound';
 import Maintenance from '../pages/common/Maintenance';
 
-// Guards
 import PublicRoute from './guards/PublicRoute';
-// import ProtectedRoute from './guards/ProtectedRoute';
+import ProtectedRoute from './guards/ProtectedRoute';
+import Dashboard from '../pages/Dashboard';
 
 const Layout: React.FC = () => {
   const theme = useTheme();
@@ -56,14 +57,13 @@ const AppRouter: React.FC = () => {
   return (
     <Routes>
       <Route element={<PublicRoute />}>
-        <Route path="/login" element={<Login />} />
+        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/register" element={<Register />} />
       </Route>
 
-      {/* Example of a Protected Route (uncomment when needed):
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
       </Route> 
-      */}
 
       <Route path="/maintenance" element={<Maintenance />} />
       

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { validateSession } from '../../store/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '../../../store/hooks';
+import { validateSession } from '../../../store/slices/authSlice';
 
 interface AuthInitializerProps {
     children: React.ReactNode;

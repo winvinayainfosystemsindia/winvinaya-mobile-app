@@ -3,7 +3,7 @@ import { Box, Container, Typography, Grid, IconButton, Stack, Link } from '@mui/
 import { Public, AlternateEmail, Share } from '@mui/icons-material';
 import { designTokens } from '../../theme/designTokens';
 
-const HomeFooter: React.FC = () => {
+const Footer: React.FC = () => {
   return (
     <Box component="footer" sx={{ bgcolor: '#f8fafc', borderTop: '1px solid #e2e8f0', py: 12, px: 2 }}>
       <Container maxWidth="lg">
@@ -13,10 +13,10 @@ const HomeFooter: React.FC = () => {
               variant="h6" 
               sx={{ fontWeight: 900, color: '#0f172a', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}
             >
-              Academic Curator
+              WinVinaya
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.8, mb: 4 }}>
-              Redefining online education through elite curation and intellectual integrity. We bring you the most rigorous and impactful knowledge from global experts.
+              Empowering organizations and individuals through inclusive and professional learning excellence. We provide premium educational resources to bridge the talent gap.
             </Typography>
             <Stack direction="row" spacing={2}>
               {[Public, AlternateEmail, Share].map((Icon, i) => (
@@ -35,12 +35,12 @@ const HomeFooter: React.FC = () => {
           
           {[
             { 
-              title: 'Education', 
-              links: ['Course Catalog', 'Certifications', 'Degrees', 'Academic Board'] 
+              title: 'Platform', 
+              links: ['Courses', 'Learning Paths', 'Assessment', 'Dashboard'] 
             },
             { 
-              title: 'Community', 
-              links: ['Blog', 'Help Center', 'Careers', 'Contact Support'] 
+              title: 'Company', 
+              links: ['About Us', 'Success Stories', 'Resources', 'Support'] 
             },
             { 
               title: 'Legal', 
@@ -75,11 +75,11 @@ const HomeFooter: React.FC = () => {
         
         <Box sx={{ pt: 6, borderTop: '1px solid #e2e8f0', display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: 'center', gap: 3 }}>
           <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 500 }}>
-            © {new Date().getFullYear()} Academic Curator. Knowledge Showcased.
+            © {new Date().getFullYear()} WinVinaya, Inc. Education Perfected.
           </Typography>
           <Stack direction="row" spacing={4}>
-            <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, letterSpacing: '0.05em' }}>EN / USD</Typography>
-            <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, letterSpacing: '0.05em' }}>v2.4.0</Typography>
+            <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, letterSpacing: '0.05em' }}>EN / INR</Typography>
+            <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, letterSpacing: '0.05em' }}>v1.2.0</Typography>
           </Stack>
         </Box>
       </Container>
@@ -87,4 +87,4 @@ const HomeFooter: React.FC = () => {
   );
 };
 
-export default HomeFooter;
+export default Footer;
