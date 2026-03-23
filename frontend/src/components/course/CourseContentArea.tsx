@@ -3,7 +3,7 @@ import { Box, Typography, Paper, CircularProgress, Tabs, Tab, Divider } from '@m
 import { PlayCircleOutline } from '@mui/icons-material';
 import { type Lesson, type Course } from '../../models/course';
 import VideoPlayer from './VideoPlayer';
-import QuizPlayer from '../QuizPlayer';
+import QuizPlayer from '../quiz/QuizPlayer';
 import PPTViewer from './PPTViewer';
 import CodeSandbox from './CodeSandbox';
 import DiscussionThread from './DiscussionThread';
@@ -100,30 +100,30 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
           </Box>
         ) : lesson.content_type === 'ppt' ? (
           <Box sx={{ p: 0, bgcolor: '#f7f9fa', minHeight: 400 }}>
-             {slidesLoading ? (
-               <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
-                 <CircularProgress />
-               </Box>
-             ) : (
-               <PPTViewer slides={slides} />
-             )}
+            {slidesLoading ? (
+              <Box sx={{ p: 4, display: 'flex', justifyContent: 'center' }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <PPTViewer slides={slides} />
+            )}
           </Box>
         ) : lesson.content_type === 'code' ? (
           <Box sx={{ p: 0, bgcolor: '#1e1e1e', height: 600 }}>
-             {codingLoading ? (
-               <Box sx={{ p: 4, display: 'flex', justifyContent: 'center', color: '#fff' }}>
-                 <CircularProgress color="inherit" />
-               </Box>
-             ) : codingExercise ? (
-               <CodeSandbox 
-                 exercise={codingExercise} 
-                 onSubmit={(code) => onCodeSubmit ? onCodeSubmit(codingExercise.id, code) : Promise.reject('No submit handler')}
-               />
-             ) : (
-               <Box sx={{ p: 4, color: '#fff' }}>
-                 <Typography>No coding exercise details found.</Typography>
-               </Box>
-             )}
+            {codingLoading ? (
+              <Box sx={{ p: 4, display: 'flex', justifyContent: 'center', color: '#fff' }}>
+                <CircularProgress color="inherit" />
+              </Box>
+            ) : codingExercise ? (
+              <CodeSandbox
+                exercise={codingExercise}
+                onSubmit={(code) => onCodeSubmit ? onCodeSubmit(codingExercise.id, code) : Promise.reject('No submit handler')}
+              />
+            ) : (
+              <Box sx={{ p: 4, color: '#fff' }}>
+                <Typography>No coding exercise details found.</Typography>
+              </Box>
+            )}
           </Box>
         ) : (
           <Box sx={{ p: 4, bgcolor: '#fff', minHeight: 400 }}>
@@ -135,10 +135,10 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
       </Paper>
 
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
-        <Tabs 
-          value={tabValue} 
-          onChange={handleTabChange} 
-          textColor="primary" 
+        <Tabs
+          value={tabValue}
+          onChange={handleTabChange}
+          textColor="primary"
           indicatorColor="primary"
           sx={{
             '& .MuiTab-root': { fontWeight: 700, textTransform: 'none', minWidth: 100 }
@@ -158,9 +158,9 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
             <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
               {lesson.description || 'No description provided for this lesson.'}
             </Typography>
-            
+
             <Divider sx={{ my: 4 }} />
-            
+
             <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>Course Description</Typography>
             <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
               {course.description || 'Welcome to this course!'}
@@ -171,9 +171,9 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
         {tabValue === 1 && (
           <Box>
             {onPostDiscussion && (
-              <DiscussionThread 
-                discussions={discussions} 
-                onPost={onPostDiscussion} 
+              <DiscussionThread
+                discussions={discussions}
+                onPost={onPostDiscussion}
               />
             )}
           </Box>
@@ -182,9 +182,9 @@ const CourseContentArea: React.FC<CourseContentAreaProps> = ({
         {tabValue === 2 && (
           <Box>
             {onRateCourse && (
-              <CourseRating 
-                ratings={ratings} 
-                onRate={onRateCourse} 
+              <CourseRating
+                ratings={ratings}
+                onRate={onRateCourse}
               />
             )}
           </Box>

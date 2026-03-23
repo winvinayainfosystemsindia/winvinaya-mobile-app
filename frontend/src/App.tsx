@@ -6,7 +6,6 @@ import theme from './theme';
 import { SnackbarProvider } from 'notistack';
 import { BrowserRouter as Router } from 'react-router-dom';
 import AppRouter from './router/AppRouter';
-import SmoothScroll from "./components/layout/SmoothScroll";
 import { AuthProvider } from './context/AuthContext';
 import AuthInitializer from './components/auth/AuthInitializer';
 
@@ -17,13 +16,11 @@ function App() {
         <CssBaseline />
         <SnackbarProvider maxSnack={3}>
           <Router>
-            <SmoothScroll>
               <AuthProvider>
                 <AuthInitializer>
                   <AppRouter />
                 </AuthInitializer>
               </AuthProvider>
-            </SmoothScroll>
           </Router>
         </SnackbarProvider>
       </ThemeProvider>

@@ -18,11 +18,11 @@ import {
   Replay,
   List as ListIcon,
 } from '@mui/icons-material';
-import contentService, { QuizQuestionType, type Quiz, type QuizAttempt } from '../services/contentService';
-import MCQQuestion from './quiz/MCQQuestion';
-import TrueFalseQuestion from './quiz/TrueFalseQuestion';
-import MatchingQuestion from './quiz/MatchingQuestion';
-import QuestionReview from './quiz/QuestionReview';
+import contentService, { QuizQuestionType, type Quiz, type QuizAttempt } from '../../services/contentService';
+import MCQQuestion from './MCQQuestion';
+import TrueFalseQuestion from './TrueFalseQuestion';
+import MatchingQuestion from './MatchingQuestion';
+import QuestionReview from './QuestionReview';
 
 interface QuizPlayerProps {
   quizId: number;
