@@ -64,10 +64,11 @@ const theme = createTheme({
         },
         containedPrimary: {
           background: designTokens.colors.primary,
+          color: '#ffffff',
           '&:hover': {
             background: designTokens.colors.primaryDark,
+            boxShadow: '0 8px 16px -4px rgba(0, 86, 210, 0.3)',
             transform: 'translateY(-1px)',
-            boxShadow: '0 4px 12px rgba(164, 53, 240, 0.35)',
           },
         },
         outlinedPrimary: {
@@ -102,10 +103,11 @@ const theme = createTheme({
           borderRadius: designTokens.shape.cardBorderRadius,
           border: `1px solid ${designTokens.colors.border}`,
           boxShadow: designTokens.shadows.card,
-          transition: 'box-shadow 0.2s ease, transform 0.2s ease',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
             boxShadow: designTokens.shadows.cardHover,
-            transform: 'translateY(-4px)',
+            transform: 'translateY(-6px)',
+            borderColor: designTokens.colors.primaryLight,
           },
         },
       },
@@ -123,15 +125,16 @@ const theme = createTheme({
     MuiListItemButton: {
       styleOverrides: {
         root: {
-          borderRadius: designTokens.shape.borderRadius,
-          margin: '2px 8px',
-          padding: '9px 12px',
+          borderRadius: 8,
+          margin: '4px 12px',
+          padding: '10px 16px',
+          transition: 'all 0.2s ease',
           '&.Mui-selected': {
-            backgroundColor: designTokens.colors.sidebarActiveBg,
-            color: designTokens.colors.sidebarActive,
-            borderLeft: `3px solid ${designTokens.colors.sidebarActive}`,
-            '& .MuiListItemIcon-root': { color: designTokens.colors.sidebarActive },
-            '&:hover': { backgroundColor: designTokens.colors.sidebarActiveBg },
+            backgroundColor: designTokens.colors.primary,
+            color: '#ffffff',
+            '& .MuiListItemIcon-root': { color: '#ffffff' },
+            '& .MuiTypography-root': { fontWeight: 700 },
+            '&:hover': { backgroundColor: designTokens.colors.primaryDark },
           },
           '&:hover': { backgroundColor: designTokens.colors.sidebarHover },
         },
@@ -185,17 +188,19 @@ const theme = createTheme({
     MuiTableRow: {
       styleOverrides: {
         root: {
-          '&:hover': { backgroundColor: '#fafafa' },
+          transition: 'background-color 0.2s ease',
+          '&:hover': { backgroundColor: designTokens.colors.sidebarHover },
         },
       },
     },
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          backgroundColor: designTokens.colors.dark,
+          backgroundColor: designTokens.colors.secondary,
           fontSize: '12px',
-          borderRadius: 4,
-          padding: '6px 10px',
+          borderRadius: 8,
+          padding: '8px 12px',
+          boxShadow: designTokens.shadows.dropdown,
         },
       },
     },
