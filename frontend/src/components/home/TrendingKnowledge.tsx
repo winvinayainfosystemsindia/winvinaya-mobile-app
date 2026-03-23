@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, IconButton, Rating, Paper } from '@mui/material';
 import { ChevronLeft, ChevronRight, AddShoppingCart, Star } from '@mui/icons-material';
-import { TRENDING_COURSES } from '../../data/homeData';
+import { TRENDING_COURSES } from '../../data/home/homeData';
 
 const TrendingKnowledge: React.FC = () => {
   return (

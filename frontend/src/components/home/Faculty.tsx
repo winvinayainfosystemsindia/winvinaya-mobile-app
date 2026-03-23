@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Container, Typography, Grid, Stack, Divider } from '@mui/material';
-import { FACULTY } from '../../data/homeData';
+import { FACULTY } from '../../data/home/homeData';
 
 const Faculty: React.FC = () => {
   return (
@@ -17,9 +17,9 @@ const Faculty: React.FC = () => {
           {FACULTY.map((member) => (
             <Grid key={member.name} size={{ xs: 12, md: 4 }}>
               <Box sx={{ textAlign: 'center' }}>
-                <Box 
-                  sx={{ 
-                    width: 200, height: 200, borderRadius: '50%', 
+                <Box
+                  sx={{
+                    width: 200, height: 200, borderRadius: '50%',
                     mx: 'auto', mb: 4, overflow: 'hidden',
                     position: 'relative', boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
                     '& img': {
@@ -32,7 +32,7 @@ const Faculty: React.FC = () => {
                   <img src={member.image} alt={member.name} />
                   <Box sx={{ position: 'absolute', inset: 0, border: '6px solid rgba(255,255,255,0.2)', borderRadius: '50%' }} />
                 </Box>
-                
+
                 <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>{member.name}</Typography>
                 <Typography sx={{ color: member.tagColor, fontWeight: 700, fontSize: '0.875rem', mb: 2 }}>
                   {member.title}
@@ -40,7 +40,7 @@ const Faculty: React.FC = () => {
                 <Typography variant="body2" sx={{ color: 'text.secondary', px: 2, mb: 4, lineHeight: 1.6 }}>
                   {member.desc}
                 </Typography>
-                
+
                 <Stack direction="row" spacing={3} justifyContent="center" alignItems="center">
                   <Box>
                     <Typography sx={{ fontWeight: 900, fontSize: '1.25rem' }}>{member.students}</Typography>

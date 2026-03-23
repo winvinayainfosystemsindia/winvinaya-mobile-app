@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Container, Typography, Button, Paper, Grid } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
-import { CATEGORIES } from '../../data/homeData';
+import { CATEGORIES } from '../../data/home/homeData';
 
 const ExploreDisciplines: React.FC = () => {
   return (

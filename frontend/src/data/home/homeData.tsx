@@ -1,11 +1,11 @@
-import { 
-  Architecture, 
-  DataObject, 
-  AccountBalance, 
-  Biotech, 
-  School 
+import {
+  Architecture,
+  DataObject,
+  AccountBalance,
+  Biotech,
+  School
 } from '@mui/icons-material';
-import { designTokens } from '../theme/designTokens';
+import { designTokens } from '../../theme/designTokens';
 
 export const CATEGORIES = [
   {
