@@ -1,4 +1,4 @@
-import { type UserRole } from '../models/auth';
+import { type UserRole } from '../../models/auth';
 import {
   Dashboard,
   School,
