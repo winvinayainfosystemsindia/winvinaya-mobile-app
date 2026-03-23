@@ -8,11 +8,13 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import { Outlet } from 'react-router-dom';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import TopBar from './TopBar';
+import Navbar from '../components/layout/Navbar';
 import SideNav from './SideNav';
 import { designTokens } from '../theme/designTokens';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { logout } from '../store/slices/authSlice';
+import { Outlet, useNavigate } from 'react-router-dom';
 
 const DRAWER_WIDTH = designTokens.spacing.sidebarWidth;
 const DRAWER_COLLAPSED_WIDTH = designTokens.spacing.sidebarCollapsedWidth;
@@ -26,6 +28,10 @@ const AppShell: React.FC = () => {
     return localStorage.getItem(STORAGE_KEY) === 'true';
   });
 
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { user, isAuthenticated } = useAppSelector((state) => state.auth);
+
   const effectiveWidth = isMobile ? 0 : collapsed ? DRAWER_COLLAPSED_WIDTH : DRAWER_WIDTH;
 
   const handleDrawerToggle = () => setMobileOpen((prev) => !prev);
@@ -36,14 +42,22 @@ const AppShell: React.FC = () => {
     localStorage.setItem(STORAGE_KEY, String(next));
   };
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
+
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
       <CssBaseline />
 
       {/* Top Navbar */}
-      <TopBar
-        drawerWidth={effectiveWidth}
+      <Navbar 
+        user={user} 
+        isAuthenticated={isAuthenticated} 
+        isMobile={isMobile}
         onDrawerToggle={handleDrawerToggle}
+        onLogout={handleLogout}
       />
 
       {/* Side Navigation — Mobile (temporary) */}

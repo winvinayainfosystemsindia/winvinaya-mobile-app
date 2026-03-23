@@ -37,6 +37,14 @@ const CourseCatalog: React.FC = () => {
     dispatch(fetchCourses());
   }, [dispatch]);
 
+  // Sync searchQuery with URL param 'q'
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q !== null) {
+      setSearchQuery(q);
+    }
+  }, [searchParams]);
+
   const toggleLevel = (level: string) => {
     setSelectedLevels(prev =>
       prev.includes(level) ? prev.filter(l => l !== level) : [...prev, level]
@@ -106,7 +114,13 @@ const CourseCatalog: React.FC = () => {
     <Box sx={{ bgcolor: '#ffffff', minHeight: '100vh' }}>
       <Container maxWidth="xl" sx={{ py: 6 }}>
         <CatalogHeader 
-          categoryName={selectedCategories.length === 1 ? selectedCategories[0] : "Academic Disciplines"} 
+          categoryName={
+            searchQuery 
+              ? `Results for "${searchQuery}"` 
+              : selectedCategories.length === 1 
+                ? selectedCategories[0] 
+                : "Academic Disciplines"
+          } 
           resultCount={results.length} 
         />
 

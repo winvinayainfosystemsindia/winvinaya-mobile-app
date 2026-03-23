@@ -47,6 +47,8 @@ const AppRouter: React.FC = () => {
       
       <Route element={<PublicLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/catalog" element={<CourseCatalog />} />
+        <Route path="/my-learning" element={<MyLearning />} />
         <Route path="/courses/:coursePublicId" element={<CourseDetail />} />
       </Route>
 
@@ -56,10 +58,6 @@ const AppRouter: React.FC = () => {
           
           {/* Unified Role-Adaptive Dashboard */}
           <Route path="/dashboard" element={<Dashboard />} />
-
-          {/* Catalog & Learning */}
-          <Route path="/catalog" element={<CourseCatalog />} />
-          <Route path="/my-learning" element={<MyLearning />} />
 
           {/* Shared Scaffolded Pages */}
           <Route path="/reports" element={<Reports />} />

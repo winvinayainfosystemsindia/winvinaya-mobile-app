@@ -25,7 +25,7 @@ import {
 	NotificationsNone as NotificationsIcon,
 	PersonOutline as PersonIcon
 } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { User } from '../../models/auth';
 
 interface NavbarProps {
@@ -60,8 +60,19 @@ const Navbar: React.FC<NavbarProps> = ({
 		handleMenuClose();
 	};
 
+	const location = useLocation();
+
+	const [searchQuery, setSearchQuery] = useState('');
+
+	const handleSearchSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		if (searchQuery.trim()) {
+			navigate(`/catalog?q=${encodeURIComponent(searchQuery.trim())}`);
+		}
+	};
+
 	const navLinks = [
-		{ text: 'Categories', path: '/catalog' },
+		{ text: 'Explore Disciplines', path: '/catalog' },
 		{ text: 'My Learning', path: '/my-learning' },
 		{ text: 'Teach', path: '/teach' },
 		{ text: 'Instructor', path: '/dashboard' },
@@ -110,24 +121,32 @@ const Navbar: React.FC<NavbarProps> = ({
 
 					{!isMobile && (
 						<Stack direction="row" spacing={3} sx={{ mr: 2 }}>
-							{navLinks.map((link) => (
-								<Link
-									key={link.text}
-									onClick={() => navigate(link.path)}
-									sx={{
-										color: '#475569',
-										fontWeight: 600,
-										fontSize: '14px',
-										cursor: 'pointer',
-										textDecoration: 'none',
-										transition: 'color 0.2s',
-										whiteSpace: 'nowrap',
-										'&:hover': { color: '#0055d1' }
-									}}
-								>
-									{link.text}
-								</Link>
-							))}
+							{navLinks.map((link) => {
+								const isActive = location.pathname === link.path;
+								return (
+									<Link
+										key={link.text}
+										onClick={() => navigate(link.path)}
+										sx={{
+											color: isActive ? '#0055d1' : '#475569',
+											fontWeight: isActive ? 800 : 600,
+											fontSize: '14px',
+											cursor: 'pointer',
+											textDecoration: 'none',
+											transition: 'all 0.2s',
+											whiteSpace: 'nowrap',
+											borderBottom: isActive ? '2px solid #0055d1' : '2px solid transparent',
+											pb: '4px',
+											'&:hover': { 
+												color: '#0055d1',
+												borderBottom: '2px solid #0055d1'
+											}
+										}}
+									>
+										{link.text}
+									</Link>
+								);
+							})}
 						</Stack>
 					)}
 
@@ -135,6 +154,7 @@ const Navbar: React.FC<NavbarProps> = ({
 					<Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'flex' }, justifyContent: 'center' }}>
 						<Paper
 							component="form"
+							onSubmit={handleSearchSubmit}
 							sx={{
 								p: '2px 14px',
 								display: 'flex',
@@ -160,6 +180,8 @@ const Navbar: React.FC<NavbarProps> = ({
 								sx={{ flex: 1, fontSize: '14px', fontWeight: 500 }}
 								placeholder="Search for courses..."
 								inputProps={{ 'aria-label': 'search courses' }}
+								value={searchQuery}
+								onChange={(e) => setSearchQuery(e.target.value)}
 							/>
 						</Paper>
 					</Box>
