@@ -58,3 +58,45 @@ def get_current_instructor(
     current_user=Depends(require_role("admin", "instructor"))
 ):
     return current_user
+
+
+from datetime import datetime
+from app.models.enrollment import Enrollment, EnrollmentStatus
+
+async def can_access_course(
+    course_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    """
+    Dependency: Verify if the current user has active, non-expired access to a course.
+    Checks Enrollment status and expiry, then checks UserCourseAccess override.
+    """
+    from app.repositories.enrollment import enrollment_repository
+    from app.repositories.enrollment_access import user_course_access_repository
+    
+    # 1. Check for active enrollment
+    enrollment = await enrollment_repository.get_by_user_and_course(db, current_user.id, course_id)
+    if not enrollment or enrollment.status == EnrollmentStatus.dropped:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not enrolled in this course."
+        )
+    
+    # 2. Check for per-user access override first (highest priority)
+    override = await user_course_access_repository.get_by_user_and_course(db, current_user.id, course_id)
+    expiry = None
+    
+    if override:
+        expiry = override.expiry_date
+    elif enrollment.expiry_date:
+        expiry = enrollment.expiry_date
+        
+    # 3. Enforce expiry
+    if expiry and expiry < datetime.utcnow():
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your access to this course has expired."
+        )
+        
+    return enrollment

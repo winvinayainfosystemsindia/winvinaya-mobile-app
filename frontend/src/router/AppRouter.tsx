@@ -10,6 +10,8 @@ import AdminCourseCreate from '../pages/AdminCourseCreate';
 import AdminCourseEdit from '../pages/AdminCourseEdit';
 import CourseDetail from '../pages/CourseDetail';
 import CoursePlayer from '../pages/CoursePlayer';
+import AdminGroups from '../pages/admin/AdminGroups';
+import AdminEnrollments from '../pages/admin/AdminEnrollments';
 
 const AppRouter: React.FC = () => {
 	return (
@@ -38,6 +40,8 @@ const AppRouter: React.FC = () => {
 					{/* Admin Routes */}
 					<Route path="/admin/courses/create" element={<AdminCourseCreate />} />
 					<Route path="/admin/courses/:courseId/edit" element={<AdminCourseEdit />} />
+					<Route path="/admin/groups" element={<AdminGroups />} />
+					<Route path="/admin/enrollments" element={<AdminEnrollments />} />
 				</Route>
 			</Route>
 

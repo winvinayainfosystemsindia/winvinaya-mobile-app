@@ -15,3 +15,4 @@ from app.models.coding import CodingExercise, CodeSubmission
 from app.models.discussion import LessonDiscussion
 from app.models.rating import CourseRating
 from app.models.notification import Notification
+from app.models.enrollment_access import UserCourseAccess

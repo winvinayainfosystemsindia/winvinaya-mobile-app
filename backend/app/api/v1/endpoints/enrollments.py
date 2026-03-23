@@ -2,13 +2,16 @@
 Enrollment endpoint — enroll, unenroll, and list learners.
 """
 from typing import List
+from datetime import datetime
 
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
-from app.core.dependencies import get_current_user, get_current_instructor
+from app.core.dependencies import get_current_user, get_current_instructor, get_current_admin
 from app.core.exceptions import ConflictError, NotFoundError
 from app.db.session import get_db
+from app.models.enrollment import Enrollment
 from app.repositories.course import course_repository
 from app.repositories.enrollment import enrollment_repository
 from app.schemas.enrollment import EnrollmentCreate, EnrollmentResponse
@@ -56,6 +59,35 @@ async def my_enrollments(
     current_user=Depends(get_current_user),
 ):
     return await enrollment_repository.get_user_enrollments(db, current_user.id, skip=skip, limit=limit)
+
+
+@router.get("/admin/all", response_model=List[EnrollmentResponse],
+            summary="List all enrollments in the platform (Admin only)")
+async def all_enrollments(
+    skip: int = 0,
+    limit: int = 100,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_admin),
+):
+    return await enrollment_repository.get_multi(db, skip=skip, limit=limit)
+
+
+@router.patch("/admin/{enrollment_id}/expiry", response_model=EnrollmentResponse,
+              summary="Set enrollment expiry date (Admin only)")
+async def set_expiry(
+    enrollment_id: int,
+    expiry_date: datetime,
+    db: AsyncSession = Depends(get_db),
+    current_user=Depends(get_current_admin),
+):
+    enrollment = await db.get(Enrollment, enrollment_id)
+    if not enrollment:
+        raise NotFoundError("Enrollment")
+    
+    enrollment.expiry_date = expiry_date
+    await db.commit()
+    await db.refresh(enrollment)
+    return enrollment
 
 
 @router.get("/{course_id}/learners", response_model=List[EnrollmentResponse],
