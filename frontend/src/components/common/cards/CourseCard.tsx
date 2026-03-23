@@ -9,7 +9,7 @@ import {
   LinearProgress,
   Chip,
 } from '@mui/material';
-import { designTokens } from '../../theme/designTokens';
+import { designTokens } from '../../../theme/designTokens';
 
 interface CourseCardProps {
   title: string;

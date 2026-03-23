@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button, type SvgIconProps } from '@mui/material';
 import { SentimentDissatisfied } from '@mui/icons-material';
-import { designTokens } from '../../theme/designTokens';
+import { designTokens } from '../../../theme/designTokens';
 
 interface EmptyStateProps {
   icon?: React.ReactElement<SvgIconProps>;
