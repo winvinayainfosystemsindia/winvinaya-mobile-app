@@ -187,7 +187,7 @@ const Navbar: React.FC<NavbarProps> = ({
 					</Box>
 
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1.5 } }}>
-						{isAuthenticated ? (
+						{isAuthenticated && location.pathname !== '/' && location.pathname !== '/catalog' ? (
 							<>
 								<IconButton sx={{ color: '#475569', display: { xs: 'none', md: 'flex' } }}>
 									<FavoriteBorderIcon fontSize="medium" />
@@ -221,36 +221,92 @@ const Navbar: React.FC<NavbarProps> = ({
 							</>
 						) : (
 							<Stack direction="row" spacing={1.5}>
-								<Button
-									variant="text"
-									sx={{
-										color: '#0f172a',
-										fontWeight: 800,
-										textTransform: 'none',
-										fontSize: '14px'
-									}}
-									onClick={() => navigate('/login')}
-								>
-									Log in
-								</Button>
-								<Button
-									variant="contained"
-									sx={{
-										bgcolor: '#0055d1',
-										color: '#ffffff',
-										fontWeight: 800,
-										borderRadius: '10px',
-										px: 3,
-										py: 1.2,
-										textTransform: 'none',
-										fontSize: '14px',
-										boxShadow: 'none',
-										'&:hover': { bgcolor: '#0040a1', boxShadow: 'none' }
-									}}
-									onClick={() => navigate('/register')}
-								>
-									Sign up
-								</Button>
+								{(location.pathname === '/' || location.pathname === '/catalog') && !isAuthenticated ? (
+									<>
+										<Button
+											variant="text"
+											sx={{
+												color: '#0f172a',
+												fontWeight: 800,
+												textTransform: 'none',
+												fontSize: '14px'
+											}}
+											onClick={() => navigate('/login')}
+										>
+											Log in
+										</Button>
+										<Button
+											variant="contained"
+											sx={{
+												bgcolor: '#0055d1',
+												color: '#ffffff',
+												fontWeight: 800,
+												borderRadius: '10px',
+												px: 3,
+												py: 1.2,
+												textTransform: 'none',
+												fontSize: '14px',
+												boxShadow: 'none',
+												'&:hover': { bgcolor: '#0040a1', boxShadow: 'none' }
+											}}
+											onClick={() => navigate('/register')}
+										>
+											Sign up
+										</Button>
+									</>
+								) : isAuthenticated ? (
+									<Button
+										variant="contained"
+										sx={{
+											bgcolor: '#0055d1',
+											color: '#ffffff',
+											fontWeight: 800,
+											borderRadius: '10px',
+											px: 3,
+											py: 1.2,
+											textTransform: 'none',
+											fontSize: '14px',
+											boxShadow: 'none',
+											'&:hover': { bgcolor: '#0040a1', boxShadow: 'none' }
+										}}
+										onClick={() => navigate('/dashboard')}
+									>
+										Dashboard
+									</Button>
+								) : (
+									<>
+										<Button
+											variant="text"
+											sx={{
+												color: '#0f172a',
+												fontWeight: 800,
+												textTransform: 'none',
+												fontSize: '14px'
+											}}
+											onClick={() => navigate('/login')}
+										>
+											Log in
+										</Button>
+										<Button
+											variant="contained"
+											sx={{
+												bgcolor: '#0055d1',
+												color: '#ffffff',
+												fontWeight: 800,
+												borderRadius: '10px',
+												px: 3,
+												py: 1.2,
+												textTransform: 'none',
+												fontSize: '14px',
+												boxShadow: 'none',
+												'&:hover': { bgcolor: '#0040a1', boxShadow: 'none' }
+											}}
+											onClick={() => navigate('/register')}
+										>
+											Sign up
+										</Button>
+									</>
+								)}
 							</Stack>
 						)}
 					</Box>
