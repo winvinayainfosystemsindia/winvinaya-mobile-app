@@ -26,6 +26,7 @@ import {
 	PersonOutline as PersonIcon
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { designTokens } from '../../theme/designTokens';
 import type { User } from '../../models/auth';
 
 interface NavbarProps {
@@ -83,9 +84,9 @@ const Navbar: React.FC<NavbarProps> = ({
 			position="fixed"
 			sx={{
 				zIndex: theme.zIndex.drawer + 1,
-				bgcolor: '#ffffff',
-				borderBottom: '1px solid #f1f5f9',
-				height: 72,
+				bgcolor: designTokens.colors.surface,
+				borderBottom: `1px solid ${designTokens.colors.border}`,
+				height: designTokens.spacing.topbarHeight,
 				justifyContent: 'center'
 			}}
 			elevation={0}
@@ -96,7 +97,7 @@ const Navbar: React.FC<NavbarProps> = ({
 						<IconButton
 							edge="start"
 							onClick={onDrawerToggle}
-							sx={{ mr: 1, color: '#0f172a' }}
+							sx={{ mr: 1, color: designTokens.colors.textPrimary }}
 						>
 							<MenuIcon />
 						</IconButton>
@@ -128,18 +129,18 @@ const Navbar: React.FC<NavbarProps> = ({
 										key={link.text}
 										onClick={() => navigate(link.path)}
 										sx={{
-											color: isActive ? '#0055d1' : '#475569',
+											color: isActive ? designTokens.colors.primary : designTokens.colors.textSecondary,
 											fontWeight: isActive ? 800 : 600,
 											fontSize: '14px',
 											cursor: 'pointer',
 											textDecoration: 'none',
 											transition: 'all 0.2s',
 											whiteSpace: 'nowrap',
-											borderBottom: isActive ? '2px solid #0055d1' : '2px solid transparent',
+											borderBottom: isActive ? `2px solid ${designTokens.colors.primary}` : '2px solid transparent',
 											pb: '4px',
 											'&:hover': { 
-												color: '#0055d1',
-												borderBottom: '2px solid #0055d1'
+												color: designTokens.colors.primary,
+												borderBottom: `2px solid ${designTokens.colors.primary}`
 											}
 										}}
 									>
@@ -159,19 +160,19 @@ const Navbar: React.FC<NavbarProps> = ({
 								p: '2px 14px',
 								display: 'flex',
 								alignItems: 'center',
-								bgcolor: '#f1f5f9',
+								bgcolor: designTokens.colors.sidebarHover,
 								borderRadius: '100px',
-								border: '1px solid #e2e8f0',
+								border: `1px solid ${designTokens.colors.border}`,
 								width: '100%',
 								maxWidth: 500,
-								height: 44,
+								height: 40,
 								boxShadow: 'none',
 								transition: 'all 0.2s',
-								'&:hover': { bgcolor: '#f1f5f9', borderColor: '#cbd5e1' },
+								'&:hover': { bgcolor: designTokens.colors.sidebarHover, borderColor: designTokens.colors.border },
 								'&:focus-within': {
-									bgcolor: '#ffffff',
-									borderColor: '#0055d1',
-									boxShadow: '0 0 0 4px rgba(0, 85, 209, 0.1)'
+									bgcolor: designTokens.colors.surface,
+									borderColor: designTokens.colors.primary,
+									boxShadow: `0 0 0 4px rgba(0, 86, 210, 0.1)`
 								}
 							}}
 						>
@@ -187,12 +188,12 @@ const Navbar: React.FC<NavbarProps> = ({
 					</Box>
 
 					<Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1.5 } }}>
-						{isAuthenticated && location.pathname !== '/' && location.pathname !== '/catalog' ? (
+						{isAuthenticated ? (
 							<>
-								<IconButton sx={{ color: '#475569', display: { xs: 'none', md: 'flex' } }}>
+								<IconButton sx={{ color: designTokens.colors.textSecondary, display: { xs: 'none', md: 'flex' } }}>
 									<FavoriteBorderIcon fontSize="medium" />
 								</IconButton>
-								<IconButton sx={{ color: '#475569' }}>
+								<IconButton sx={{ color: designTokens.colors.textSecondary }}>
 									<Badge color="error" variant="dot" overlap="circular">
 										<NotificationsIcon fontSize="medium" />
 									</Badge>
@@ -207,106 +208,51 @@ const Navbar: React.FC<NavbarProps> = ({
 								>
 									<Avatar
 										sx={{
-											width: 40,
-											height: 40,
-											bgcolor: '#c2b280',
+											width: 36,
+											height: 36,
+											bgcolor: designTokens.colors.primary,
 											color: '#ffffff',
-											fontSize: '16px',
+											fontSize: '14px',
 											fontWeight: 700
 										}}
 									>
-										<PersonIcon />
+										{user?.full_name?.charAt(0).toUpperCase() || <PersonIcon />}
 									</Avatar>
 								</IconButton>
 							</>
 						) : (
-							<Stack direction="row" spacing={1.5}>
-								{(location.pathname === '/' || location.pathname === '/catalog') && !isAuthenticated ? (
-									<>
-										<Button
-											variant="text"
-											sx={{
-												color: '#0f172a',
-												fontWeight: 800,
-												textTransform: 'none',
-												fontSize: '14px'
-											}}
-											onClick={() => navigate('/login')}
-										>
-											Log in
-										</Button>
-										<Button
-											variant="contained"
-											sx={{
-												bgcolor: '#0055d1',
-												color: '#ffffff',
-												fontWeight: 800,
-												borderRadius: '10px',
-												px: 3,
-												py: 1.2,
-												textTransform: 'none',
-												fontSize: '14px',
-												boxShadow: 'none',
-												'&:hover': { bgcolor: '#0040a1', boxShadow: 'none' }
-											}}
-											onClick={() => navigate('/register')}
-										>
-											Sign up
-										</Button>
-									</>
-								) : isAuthenticated ? (
-									<Button
-										variant="contained"
-										sx={{
-											bgcolor: '#0055d1',
-											color: '#ffffff',
-											fontWeight: 800,
-											borderRadius: '10px',
-											px: 3,
-											py: 1.2,
-											textTransform: 'none',
-											fontSize: '14px',
-											boxShadow: 'none',
-											'&:hover': { bgcolor: '#0040a1', boxShadow: 'none' }
-										}}
-										onClick={() => navigate('/dashboard')}
-									>
-										Dashboard
-									</Button>
-								) : (
-									<>
-										<Button
-											variant="text"
-											sx={{
-												color: '#0f172a',
-												fontWeight: 800,
-												textTransform: 'none',
-												fontSize: '14px'
-											}}
-											onClick={() => navigate('/login')}
-										>
-											Log in
-										</Button>
-										<Button
-											variant="contained"
-											sx={{
-												bgcolor: '#0055d1',
-												color: '#ffffff',
-												fontWeight: 800,
-												borderRadius: '10px',
-												px: 3,
-												py: 1.2,
-												textTransform: 'none',
-												fontSize: '14px',
-												boxShadow: 'none',
-												'&:hover': { bgcolor: '#0040a1', boxShadow: 'none' }
-											}}
-											onClick={() => navigate('/register')}
-										>
-											Sign up
-										</Button>
-									</>
-								)}
+							<Stack direction="row" spacing={1}>
+								<Button
+									variant="text"
+									sx={{
+										color: designTokens.colors.textPrimary,
+										fontWeight: 700,
+										textTransform: 'none',
+										fontSize: '14px',
+										'&:hover': { bgcolor: designTokens.colors.sidebarHover }
+									}}
+									onClick={() => navigate('/login')}
+								>
+									Log in
+								</Button>
+								<Button
+									variant="contained"
+									sx={{
+										bgcolor: designTokens.colors.primary,
+										color: '#ffffff',
+										fontWeight: 700,
+										borderRadius: '8px',
+										px: 2.5,
+										py: 1,
+										textTransform: 'none',
+										fontSize: '14px',
+										boxShadow: 'none',
+										'&:hover': { bgcolor: designTokens.colors.primaryDark, boxShadow: 'none' }
+									}}
+									onClick={() => navigate('/register')}
+								>
+									Sign up
+								</Button>
 							</Stack>
 						)}
 					</Box>
@@ -322,8 +268,8 @@ const Navbar: React.FC<NavbarProps> = ({
 								borderRadius: '16px',
 								mt: 2,
 								minWidth: 280,
-								boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)',
-								border: '1px solid #f1f5f9',
+								boxShadow: designTokens.shadows.cardHover,
+								border: `1px solid ${designTokens.colors.border}`,
 								overflow: 'hidden'
 							}
 						}}
@@ -334,10 +280,10 @@ const Navbar: React.FC<NavbarProps> = ({
 									{user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
 								</Avatar>
 								<Box sx={{ minWidth: 0 }}>
-									<Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.2 }} noWrap>
+									<Typography variant="subtitle1" sx={{ fontWeight: 800, lineHeight: 1.2, color: designTokens.colors.textPrimary }} noWrap>
 										{user?.full_name || 'User'}
 									</Typography>
-									<Typography variant="caption" sx={{ color: '#64748b' }} noWrap display="block">
+									<Typography variant="caption" sx={{ color: designTokens.colors.textSecondary }} noWrap display="block">
 										{user?.email}
 									</Typography>
 								</Box>
