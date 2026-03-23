@@ -21,12 +21,30 @@ class EnrollmentRepository(BaseRepository[Enrollment, EnrollmentCreate, Enrollme
         )
         return result.scalars().first()
 
+    async def get_multi(
+        self, db: AsyncSession, *, skip: int = 0, limit: int = 100
+    ) -> List[Enrollment]:
+        from app.models.course import Course, Module
+        result = await db.execute(
+            select(Enrollment)
+            .options(
+                selectinload(Enrollment.user),
+                selectinload(Enrollment.course).selectinload(Course.modules).selectinload(Module.lessons)
+            )
+            .offset(skip)
+            .limit(limit)
+        )
+        return result.scalars().all()
+
     async def get_user_enrollments(
         self, db: AsyncSession, user_id: int, skip: int = 0, limit: int = 50
     ) -> List[Enrollment]:
+        from app.models.course import Course, Module
         result = await db.execute(
             select(Enrollment)
-            .options(selectinload(Enrollment.course))
+            .options(
+                selectinload(Enrollment.course).selectinload(Course.modules).selectinload(Module.lessons)
+            )
             .filter(Enrollment.user_id == user_id)
             .offset(skip)
             .limit(limit)
@@ -36,9 +54,13 @@ class EnrollmentRepository(BaseRepository[Enrollment, EnrollmentCreate, Enrollme
     async def get_course_learners(
         self, db: AsyncSession, course_id: int, skip: int = 0, limit: int = 100
     ) -> List[Enrollment]:
+        from app.models.course import Course, Module
         result = await db.execute(
             select(Enrollment)
-            .options(selectinload(Enrollment.user))
+            .options(
+                selectinload(Enrollment.user),
+                selectinload(Enrollment.course).selectinload(Course.modules).selectinload(Module.lessons)
+            )
             .filter(Enrollment.course_id == course_id)
             .offset(skip)
             .limit(limit)

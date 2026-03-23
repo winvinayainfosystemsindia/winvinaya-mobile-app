@@ -66,8 +66,13 @@ const CourseDetail: React.FC = () => {
       setEnrolling(true);
       await enrollmentService.enroll(course.id);
       navigate(`/student/learn/${course.public_id}`);
-    } catch (err) {
-      console.error('Enrollment failed', err);
+    } catch (err: any) {
+      if (err.response?.status === 409) {
+        // Already enrolled
+        navigate(`/student/learn/${course.public_id}`);
+      } else {
+        console.error('Enrollment failed', err);
+      }
     } finally {
       setEnrolling(false);
     }

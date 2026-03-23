@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	Container,
 	Box,
@@ -8,68 +8,39 @@ import {
 	Paper,
 	Tabs,
 	Tab,
-	Stack
+	Stack,
+	CircularProgress
 } from '@mui/material';
 import CourseCard from '../components/common/CourseCard';
 import { useNavigate } from 'react-router-dom';
+import courseService from '../services/courseService';
+import type { Course } from '../models/course';
 
 const Home: React.FC = () => {
 	const navigate = useNavigate();
 	const [tabValue, setTabValue] = React.useState(0);
+	const [courses, setCourses] = useState<Course[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const fetchPublicCourses = async () => {
+			try {
+				setLoading(true);
+				const data = await courseService.getCourses();
+				// Optionally filter by published status if needed: data.filter(c => c.status === 'published')
+				setCourses(data);
+			} catch (err) {
+				console.error('Failed to load courses', err);
+			} finally {
+				setLoading(false);
+			}
+		};
+		fetchPublicCourses();
+	}, []);
 
 	const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
 		setTabValue(newValue);
 	};
-
-	// Mock course data for marketplace
-	const courses = [
-		{
-			id: 1,
-			title: 'The Complete 2024 Web Development Bootcamp',
-			instructor: 'Dr. Angela Yu',
-			thumbnail: 'https://img-c.udemycdn.com/course/240x135/1565838_e54e_18.jpg',
-			rating: 4.7,
-			reviewsCount: 320120,
-			price: 3499,
-			originalPrice: 12999,
-			category: 'Web Development',
-			bestSeller: true
-		},
-		{
-			id: 2,
-			title: 'Ultimate AWS Certified Solutions Architect Associate',
-			instructor: 'Stephane Maarek',
-			thumbnail: 'https://img-c.udemycdn.com/course/240x135/2196488_8fc7_10.jpg',
-			rating: 4.7,
-			reviewsCount: 185000,
-			price: 499,
-			originalPrice: 3499,
-			category: 'IT & Software',
-			bestSeller: true
-		},
-		{
-			id: 3,
-			title: '100 Days of Code: The Complete Python Pro Bootcamp',
-			instructor: 'Dr. Angela Yu',
-			thumbnail: 'https://img-c.udemycdn.com/course/240x135/2776760_f176_10.jpg',
-			rating: 4.7,
-			reviewsCount: 245000,
-			price: 3499,
-			originalPrice: 12999,
-			category: 'Development'
-		},
-		{
-			id: 4,
-			title: 'React - The Complete Guide 2024 (incl. Next.js, Redux)',
-			instructor: 'Maximilian Schwarzmüller',
-			thumbnail: 'https://img-c.udemycdn.com/course/240x135/1362070_b9a1_2.jpg',
-			rating: 4.6,
-			reviewsCount: 195000,
-			price: 449,
-			originalPrice: 3899,
-			category: 'Web Development'
-		}
-	];
 
 	return (
 		<Box sx={{ pb: 8 }}>
@@ -161,23 +132,32 @@ const Home: React.FC = () => {
 							Explore Python
 						</Button>
 
-						<Grid container spacing={2}>
-							{courses.map((course) => (
-								<Grid size={{ xs: 12, sm: 6, md: 3 }} key={course.id}>
-									<CourseCard
-										title={course.title}
-										instructor={course.instructor}
-										thumbnail={course.thumbnail}
-										rating={course.rating}
-										reviewsCount={course.reviewsCount}
-										price={course.price}
-										originalPrice={course.originalPrice}
-										category={course.category}
-										bestSeller={course.bestSeller}
-									/>
-								</Grid>
-							))}
-						</Grid>
+						{loading ? (
+							<Box sx={{ py: 4, display: 'flex', justifyContent: 'center', width: '100%' }}>
+								<CircularProgress />
+							</Box>
+						) : courses.length === 0 ? (
+							<Typography variant="body1" sx={{ py: 4 }}>No courses available yet.</Typography>
+						) : (
+							<Grid container spacing={2}>
+								{courses.map((course) => (
+									<Grid size={{ xs: 12, sm: 6, md: 3 }} key={course.id}>
+										<CourseCard
+											title={course.title}
+											instructor={'WinVinaya Faculty'}
+											thumbnail={course.thumbnail_url || 'https://via.placeholder.com/240x135?text=Course'}
+											rating={course.rating_avg || 4.5}
+											reviewsCount={course.rating_count || 0}
+											price={course.price}
+											originalPrice={course.price ? course.price + 1000 : undefined}
+											category={course.category}
+											bestSeller={false}
+											onClick={() => navigate(`/courses/${course.public_id}`)}
+										/>
+									</Grid>
+								))}
+							</Grid>
+						)}
 					</Paper>
 				</Box>
 

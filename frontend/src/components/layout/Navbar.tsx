@@ -84,7 +84,7 @@ const Navbar: React.FC<NavbarProps> = ({
 				{/* Logo */}
 				<Box
 					sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', mr: 2 }}
-					onClick={() => navigate('/dashboard')}
+					onClick={() => navigate('/student/dashboard')}
 				>
 					<Box
 						component="img"
@@ -146,9 +146,9 @@ const Navbar: React.FC<NavbarProps> = ({
 									fontWeight: 700, 
 									'&:hover': { color: 'primary.dark' } 
 								}}
-								onClick={() => navigate('/admin/courses/create')}
+								onClick={() => navigate('/teacher/courses')}
 							>
-								Create Course
+								Instructor Dashboard
 							</Typography>
 						)}
 					</Box>
@@ -251,7 +251,7 @@ const Navbar: React.FC<NavbarProps> = ({
 							</Box>
 						</Box>
 						<Divider />
-						<MenuItem onClick={() => { navigate('/dashboard'); handleMenuClose(); }} sx={{ py: 1.5 }}>My learning</MenuItem>
+						<MenuItem onClick={() => { navigate('/student/dashboard'); handleMenuClose(); }} sx={{ py: 1.5 }}>My learning</MenuItem>
 						<MenuItem onClick={() => { navigate('/cart'); handleMenuClose(); }} sx={{ py: 1.5 }}>My cart</MenuItem>
 						<MenuItem onClick={() => { navigate('/wishlist'); handleMenuClose(); }} sx={{ py: 1.5 }}>Wishlist</MenuItem>
 						<Divider />
@@ -262,7 +262,7 @@ const Navbar: React.FC<NavbarProps> = ({
 						<MenuItem onClick={() => { navigate('/payment-methods'); handleMenuClose(); }} sx={{ py: 1.5 }}>Payment methods</MenuItem>
 						<Divider />
 						{(user?.role === 'admin' || user?.role === 'instructor') && (
-							<MenuItem onClick={() => { navigate('/admin/courses/create'); handleMenuClose(); }} sx={{ py: 1.5, color: 'primary.main', fontWeight: 600 }}>
+							<MenuItem onClick={() => { navigate('/teacher/courses'); handleMenuClose(); }} sx={{ py: 1.5, color: 'primary.main', fontWeight: 600 }}>
 								Instructor Dashboard
 							</MenuItem>
 						)}

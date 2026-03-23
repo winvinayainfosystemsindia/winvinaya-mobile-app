@@ -165,7 +165,7 @@ async def get_course_progress(
         select(Enrollment).filter(
             Enrollment.user_id == current_user.id,
             Enrollment.course_id == course_id,
-            Enrollment.status != EnrollmentStatus.inactive
+            Enrollment.status != EnrollmentStatus.dropped
         )
     )
     enr = enr_result.scalars().first()

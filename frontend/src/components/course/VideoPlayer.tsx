@@ -38,7 +38,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
-    if (Hls.isSupported()) {
+    const isHls = src && src.includes('.m3u8');
+
+    if (isHls && Hls.isSupported()) {
       const hls = new Hls({
         startPosition: initialTime,
         capLevelToPlayerSize: true,
@@ -70,8 +72,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           }
         }
       });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    } else if (isHls && video.canPlayType('application/vnd.apple.mpegurl')) {
       // Native HLS support (Safari)
+      video.src = src;
+      video.addEventListener('loadedmetadata', () => {
+        video.currentTime = initialTime;
+        if (autoPlay) video.play();
+      });
+    } else if (!isHls) {
+      // Direct playback for raw MP4
       video.src = src;
       video.addEventListener('loadedmetadata', () => {
         video.currentTime = initialTime;

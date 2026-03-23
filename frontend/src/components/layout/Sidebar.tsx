@@ -29,11 +29,11 @@ interface SidebarProps {
 const drawerWidth = 260;
 
 const menuItems = [
-	{ text: 'My Learning', icon: <SchoolIcon />, path: '/dashboard' },
+	{ text: 'My Learning', icon: <SchoolIcon />, path: '/student/dashboard' },
 	{ text: 'Browse Courses', icon: <ExploreIcon />, path: '/courses' },
 	{ text: 'Wishlist', icon: <FavoriteBorderIcon />, path: '/wishlist' },
 	{ text: 'My Cart', icon: <ShoppingBagIcon />, path: '/cart' },
-	{ text: 'Profile', icon: <PersonIcon />, path: '/profile' },
+	{ text: 'Profile', icon: <PersonIcon />, path: '/student/profile' },
 	{ text: 'Settings', icon: <SettingsIcon />, path: '/settings' },
 ];
 

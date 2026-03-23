@@ -34,8 +34,17 @@ async def enroll(
     if existing:
         raise ConflictError("Already enrolled in this course.")
 
+    from sqlalchemy.orm import selectinload
     enrollment_in = EnrollmentCreate(user_id=current_user.id, course_id=course_id)
-    return await enrollment_repository.create(db, obj_in=enrollment_in)
+    db_obj = await enrollment_repository.create(db, obj_in=enrollment_in)
+    
+    # Eager load the course relationship so Pydantic serialization doesn't throw MissingGreenlet
+    result = await db.execute(
+        select(Enrollment)
+        .options(selectinload(Enrollment.course))
+        .filter(Enrollment.id == db_obj.id)
+    )
+    return result.scalars().first()
 
 
 @router.delete("/{course_id}", status_code=status.HTTP_204_NO_CONTENT,
