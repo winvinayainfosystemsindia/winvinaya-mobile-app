@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Typography, Card, CardContent, LinearProgress } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import { designTokens } from '../../theme/designTokens';
 
 interface CourseCardProps {
@@ -15,19 +16,25 @@ const CourseCard: React.FC<CourseCardProps> = ({
     title,
     progress
 }) => {
+    const navigate = useNavigate();
+
     return (
-        <Card sx={{ 
-            borderRadius: '16px', 
-            boxShadow: 'none', 
-            border: `1px solid ${designTokens.colors.border}`,
-            overflow: 'hidden',
-            transition: 'transform 0.2s, box-shadow 0.2s',
-            height: '100%',
-            '&:hover': {
-                transform: 'translateY(-4px)',
-                boxShadow: '0 12px 24px rgba(0,0,0,0.06)'
-            }
-        }}>
+        <Card 
+            onClick={() => navigate('/courses/1')} // Temporary hardcoded ID for demo
+            sx={{ 
+                borderRadius: '16px', 
+                boxShadow: 'none', 
+                border: `1px solid ${designTokens.colors.border}`,
+                overflow: 'hidden',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                height: '100%',
+                cursor: 'pointer',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 12px 24px rgba(0,0,0,0.06)'
+                }
+            }}
+        >
             <Box sx={{ position: 'relative', pt: '56.25%', bgcolor: '#eee' }}>
                 <Box 
                     component="img"

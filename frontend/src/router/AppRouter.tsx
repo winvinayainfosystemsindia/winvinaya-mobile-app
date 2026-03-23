@@ -23,6 +23,7 @@ import Maintenance from '../pages/common/Maintenance';
 import PublicRoute from './guards/PublicRoute';
 import ProtectedRoute from './guards/ProtectedRoute';
 import Dashboard from '../pages/Dashboard';
+import CourseDetails from '../pages/CourseDetails';
 
 const Layout: React.FC = () => {
   const theme = useTheme();
@@ -69,6 +70,7 @@ const AppRouter: React.FC = () => {
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/catalog" element={<CourseCatalog />} />
+        <Route path="/courses/:courseId" element={<CourseDetails />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
