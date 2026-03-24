@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Container, Grid } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 // Modular Components
 import {
@@ -15,6 +15,7 @@ import {
 
 const CourseDetails: React.FC = () => {
     const { courseId } = useParams<{ courseId: string }>();
+    const navigate = useNavigate();
     console.log('Viewing course:', courseId);
 
     // Mock Data (To be replaced with real API data)
@@ -131,7 +132,7 @@ const CourseDetails: React.FC = () => {
                         <CourseSidebarCard 
                             price={mockCourse.price}
                             originalPrice={mockCourse.originalPrice}
-                            onEnroll={() => console.log('Enroll')}
+                            onEnroll={() => navigate(`/courses/${courseId}/learn`)}
                             onAddToCart={() => console.log('Add to cart')}
                         />
                     </Grid>

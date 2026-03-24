@@ -24,6 +24,7 @@ import PublicRoute from './guards/PublicRoute';
 import ProtectedRoute from './guards/ProtectedRoute';
 import Dashboard from '../pages/Dashboard';
 import CourseDetails from '../pages/CourseDetails';
+import CoursePlayer from '../pages/CoursePlayer';
 
 const Layout: React.FC = () => {
   const theme = useTheme();
@@ -72,6 +73,7 @@ const AppRouter: React.FC = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/catalog" element={<CourseCatalog />} />
           <Route path="/courses/:courseId" element={<CourseDetails />} />
+          <Route path="/courses/:courseId/learn/:lessonId?" element={<CoursePlayer />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
         <Route path="/page-not-found" element={<NotFound />} />
